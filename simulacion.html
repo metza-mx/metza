@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Simulación de 4 compras con embalaje, tiempo de envío y ganancia.">
+<title>Simulación de compras · METZA</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏺</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="simulacion" data-title="Simulación de compras">
+<main>
+<div class="ph"><h1>Simulación de 4 compras</h1><p>Embalaje, tiempo de envío y ganancia de cuatro pedidos de ejemplo.</p></div>
+<section class="wrap">
+  <p class="mut" style="margin-bottom:26px;max-width:720px">Supuestos: costo de producción de 50% del precio; envío gratis desde $1,000 (si no, lo paga el cliente). Los precios se toman del catálogo.</p>
+  <div class="sim-g" id="sim"></div>
+  <div class="card concl" id="concl"></div>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

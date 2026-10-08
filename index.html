@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Artesanías inspiradas en la tradición de Metepec.">
+<title>METZA · Historias hechas a mano</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏺</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="inicio">
+<main>
+<section class="hero">
+  <h1 id="heroT"></h1>
+  <p id="heroP"></p>
+  <a class="btn" href="catalogo.html">Ver colección</a>
+</section>
+
+<div class="wrap" style="padding-bottom:0">
+  <div class="bn" aria-label="Banners de publicidad">
+    <div class="slide on">
+      <div><h3>Conoce METZA</h3><p>Artesanías de Metepec hechas a mano. Cada pieza lleva una historia, una tradición y una identidad cultural.</p></div>
+      <a class="btn" href="#nosotros">Conocer la empresa</a>
+    </div>
+    <div class="slide">
+      <div><h3>🎁 Promoción de temporada</h3><p>Usa el código <b>METZA10</b> y obtén 10% de descuento. Envío gratis en compras desde $1,000.</p></div>
+      <a class="btn" href="catalogo.html">Aprovechar promoción</a>
+    </div>
+  </div>
+  <div class="dots" id="dots"><i class="on"></i><i></i></div>
+</div>
+
+<section id="nosotros" class="wrap">
+  <p class="eye">NUESTRA ESENCIA</p>
+  <p class="about" id="about"></p>
+</section>
+
+<section class="wrap" style="padding-top:0">
+  <h2 style="margin-bottom:26px">Piezas destacadas</h2>
+  <div class="grid" id="grid" data-limit="4"></div>
+  <div class="more"><a class="btn" href="catalogo.html">Ver todo el catálogo</a></div>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
