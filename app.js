@@ -1,11 +1,12 @@
 /* ---------- Estructura común (encabezado, pie, carrito, ventanas) ---------- */
 (function(){
+const MOSTRAR_PEDIDOS=false; // cambiar a true para mostrar "Pedidos" en el menú
 const P=document.body.dataset.page;
-const L=[['index.html','inicio','Inicio'],['catalogo.html','catalogo','Catálogo'],['simulacion.html','simulacion','Simulación de compras'],['pagos.html','pagos','Pagos y devoluciones'],['contacto.html','contacto','Contacto']];
+const L=[['index.html','inicio','Inicio'],['catalogo.html','catalogo','Catálogo'],['simulacion.html','simulacion','Pedidos'],['pagos.html','pagos','Pagos y devoluciones'],['contacto.html','contacto','Contacto']];
 document.body.insertAdjacentHTML('afterbegin',`<header><div class="hd">
 <a href="index.html" class="logo"><b id="brand"></b><small id="tag"></small></a>
-<nav>${L.map(([h,k,t])=>`<a href="${h}"${k===P?' class="act" aria-current="page"':''}>${t}</a>`).join('')}</nav>
-<div class="ic"><button id="bSet" aria-label="Configuración de la tienda">⚙️</button><button id="bCart" aria-label="Abrir carrito">🛍️<span id="cnt">0</span></button></div>
+<nav>${L.filter(l=>l[1]!=='simulacion'||MOSTRAR_PEDIDOS).map(([h,k,t])=>`<a href="${h}"${k===P?' class="act" aria-current="page"':''}>${t}</a>`).join('')}</nav>
+<div class="ic"><button id="bCart" aria-label="Abrir carrito">🛍️<span id="cnt">0</span></button></div>
 </div></header>`);
 document.body.insertAdjacentHTML('beforeend',`
 <footer><b id="fbrand"></b><span id="femail"></span><br>Hecho con orgullo en Metepec, Estado de México</footer>
@@ -14,8 +15,6 @@ document.body.insertAdjacentHTML('beforeend',`
 <div class="mh"><h2>Tu carrito</h2><button class="x" data-close aria-label="Cerrar">✕</button></div>
 <div class="mb" id="cartBody"></div><div class="mf" style="display:block" id="cartFoot"></div></aside>
 <div class="modal" id="mPay"><div class="box"><div class="mh"><h2>Finalizar compra</h2><button class="x" data-close aria-label="Cerrar">✕</button></div><div class="mb" id="payBody"></div></div></div>
-<div class="modal" id="mSet"><div class="box"><div class="mh"><h2>Configuración de tienda</h2><button class="x" data-close aria-label="Cerrar">✕</button></div><div class="mb" id="setBody"></div>
-<div class="mf"><button class="lnk" id="reset">Restaurar valores por defecto</button><button class="btn dk" id="save">Guardar cambios</button></div></div></div>
 <div class="toast" id="toast" role="status"></div>`);
 })();
 
@@ -55,9 +54,7 @@ const COSTO=.5,PAYS=['💳 Tarjeta de crédito o débito','🏦 Transferencia ba
 ZN=[['Metepec / Toluca','1 día'],['CDMX y Edomex','2–3 días'],['Resto del país','4–6 días']];
 
 /* ---------- Estado ---------- */
-function load(){const s=ls.get('metza_cfg',{});const c={...DEF,...s};
-  c.products=DEF.products.map(p=>({...p,...((s.products||[]).find(x=>x.id===p.id)||{})}));return c}
-let cfg=load(),cart=ls.get('metza_cart',{}),coupon=ls.get('metza_coupon','');
+let cfg=DEF,cart=ls.get('metza_cart',{}),coupon=ls.get('metza_coupon','');
 const prod=id=>cfg.products.find(p=>p.id==id);
 const saveCart=()=>{ls.set('metza_cart',cart);ls.set('metza_coupon',coupon)};
 function totals(){
@@ -98,13 +95,11 @@ function renderCart(){
   <button class="btn" style="width:100%;margin-top:12px" id="goPay">Proceder al pago</button>`;
   saveCart()}
 function renderSim(){if(!$('#sim'))return;
-  let tI=0,tG=0;
   $('#sim').innerHTML=SIM.map((s,i)=>{
     const its=Object.entries(s.items).map(([id,q])=>q+'× '+prod(id).n).join(', ');
     const sub=Object.entries(s.items).reduce((a,[id,q])=>a+prod(id).p*q,0);
     const cob=sub>=1000?0:s.env,ing=sub+cob,pro=sub*COSTO,gan=ing-pro-s.embC-s.env;
-    tI+=ing;tG+=gan;
-    return `<article class="card sim"><h3>Compra ${i+1}</h3><p class="mut" style="margin-bottom:8px">${esc(s.cli)}<br>${esc(its)}</p>
+    return `<article class="card sim"><h3>Pedido ${i+1}</h3><p class="mut" style="margin-bottom:8px">${esc(s.cli)}<br>${esc(its)}</p>
     <div class="l"><span>Subtotal</span><b>${money(sub)}</b></div>
     <div class="l"><span>Envío cobrado</span><b>${cob?money(cob):'Gratis'}</b></div>
     <div class="l"><span>Ingresos</span><b>${money(ing)}</b></div>
@@ -112,14 +107,7 @@ function renderSim(){if(!$('#sim'))return;
     <div class="l"><span>Embalaje: ${esc(s.emb)}</span><b>−${money(s.embC)}</b></div>
     <div class="l"><span>Envío (${esc(s.svc)})</span><b>−${money(s.env)}</b></div>
     <div class="l"><span>Tiempo de envío a ${esc(s.zona)}</span><b>${esc(s.dias)}</b></div>
-    <div class="l g"><span style="color:inherit">Ganancia</span><b>${money(gan)}</b></div></article>`}).join('');
-  const m=tI?tG/tI*100:0;
-  $('#concl').innerHTML=`<h3 style="margin-bottom:8px">Conclusiones</h3><ul>
-  <li>Las 4 compras suman ${money(tI)} en ingresos y ${money(tG)} de ganancia neta (margen de ${m.toFixed(1)}%).</li>
-  <li>El envío gratis desde $1,000 anima a comprar más piezas, pero reduce el margen en destinos lejanos.</li>
-  <li>El embalaje reforzado cuesta poco frente al precio y evita devoluciones por piezas de barro rotas.</li>
-  <li>Metepec entrega en 1 día; el resto del país tarda entre 2 y 6 días, por lo que conviene avisarlo antes del pago.</li>
-  <li>El código METZA10 resta cerca de 10% de los ingresos, así que conviene usarlo en campañas puntuales.</li></ul>`}
+    <div class="l g"><span style="color:inherit">Ganancia</span><b>${money(gan)}</b></div></article>`}).join('');}
 
 /* ---------- Carrito ---------- */
 function openDrawer(){$('#drawer').classList.add('open');$('#ov').classList.add('open')}
@@ -166,20 +154,6 @@ function openPay(){
     <div class="tr t"><span>Total</span><span>${money(t.total)}</span></div></div></div>`;
     cart={};coupon='';renderCart()}}
 
-/* ---------- Configuración ---------- */
-const FIELDS=[['brand','Nombre de marca'],['tag','Eslogan'],['heroT','Título principal'],['heroP','Texto principal','t'],['about','Texto nosotros','t'],['email','Correo de contacto']];
-$('#bSet').onclick=()=>{
-  $('#setBody').innerHTML=`<div class="sec" style="margin-top:0">Identidad</div>`+
-  FIELDS.map(([k,l,t])=>`<label class="mut" style="font-weight:600">${l.toUpperCase()}</label>${t?`<textarea id="f_${k}" rows="3" style="margin:4px 0 12px">${esc(cfg[k])}</textarea>`:`<input id="f_${k}" value="${esc(cfg[k])}" style="margin:4px 0 12px">`}`).join('')+
-  `<div class="sec">Precios y nombres de productos</div>`+
-  cfg.products.map(p=>`<div class="pg"><input id="n_${p.id}" value="${esc(p.n)}" aria-label="Nombre"><input id="p_${p.id}" type="number" min="0" value="${p.p}" aria-label="Precio"></div>`).join('');
-  $('#mSet').classList.add('open')};
-$('#save').onclick=()=>{
-  const s={};FIELDS.forEach(([k])=>s[k]=$('#f_'+k).value.trim()||DEF[k]);
-  s.products=cfg.products.map(p=>({id:p.id,n:$('#n_'+p.id).value.trim()||p.n,p:Math.max(0,+$('#p_'+p.id).value||0)}));
-  ls.set('metza_cfg',s);cfg=load();refresh();closeAll();toast('Cambios guardados')};
-$('#reset').onclick=()=>{if(confirm('¿Restaurar todos los valores originales?')){ls.del('metza_cfg');cfg=load();refresh();closeAll();toast('Valores restaurados')}};
-
 /* ---------- Contacto (abre el correo del visitante) ---------- */
 if($('#fContact'))$('#fContact').onsubmit=e=>{e.preventDefault();
   const f=new FormData(e.target);
@@ -194,3 +168,61 @@ if(slides.length>1)setInterval(()=>showBn((bi+1)%slides.length),6000);
 
 function refresh(){renderTexts();renderCats();renderGrid();renderCart();renderSim()}
 refresh();
+
+/* ---------- Devoluciones interactivas (simulación paso a paso) ---------- */
+(function(){
+const box=$('#ret');if(!box)return;
+const rnd=n=>Array.from({length:n},()=>Math.floor(Math.random()*10)).join('');
+const dt=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('es-MX',{day:'numeric',month:'short'})};
+const REAS=[['dano','💔 Llegó dañada','Necesitamos al menos una foto de la pieza y del embalaje.'],
+ ['error','📦 No es lo que pedí','Revisaremos tu pedido contra tu compra.'],
+ ['arrep','💭 Cambié de opinión','Aceptamos piezas sin uso dentro de los 7 días.']];
+const SOL=[['reembolso','💵 Reembolso','Devolvemos el importe a tu método de pago en 5 días hábiles.'],
+ ['cambio','🔄 Cambio','Te enviamos la misma pieza, sujeto a disponibilidad.']];
+const DAYS=[0,1,3,5,8];
+let s={step:1,d:{},stage:0,photos:[]};
+const head=()=>`<ol class="steps">${['Pedido','Motivo','Solución','Seguimiento'].map((t,i)=>`<li class="${i+1<s.step?'done':i+1===s.step?'cur':''}"${i+1===s.step?' aria-current="step"':''}><span>${i+1}</span>${t}</li>`).join('')}</ol>`;
+const radios=(L,name,cur)=>`<div class="opts">${L.map(([k,t,h])=>`<label class="opt"><input type="radio" name="${name}" value="${k}"${cur===k?' checked':''} required><span><b>${t}</b><small>${h}</small></span></label>`).join('')}</div>`;
+const back='<button type="button" class="btn sm ghost" data-a="back">Atrás</button>';
+const V={
+1:()=>`<form id="rf1" class="fm">
+<label class="w">Número de pedido<input name="f" required pattern="MTZ-[0-9]{6}" placeholder="MTZ-482913" value="${esc(s.d.f||'')}" title="Formato: MTZ- seguido de 6 números"></label>
+<p class="w mut" style="margin-top:-6px">Lo encuentras en la confirmación de tu compra. <button type="button" class="lnk2" data-a="ej">Usar número de ejemplo</button></p>
+<label class="w">Pieza a devolver<select name="p">${cfg.products.map(p=>`<option value="${p.id}"${s.d.p===p.id?' selected':''}>${esc(p.n)} · ${money(p.p)}</option>`).join('')}</select></label>
+<label class="w">¿Cuánto tiempo pasó desde que recibiste tu pedido?<select name="t">${['0–2 días','3–7 días','Más de 7 días'].map((t,i)=>`<option value="${i}"${s.d.t===i?' selected':''}>${t}</option>`).join('')}</select></label>
+<button class="btn dk w" style="padding:14px">Continuar</button></form>`,
+2:()=>`<form id="rf2">${radios(REAS,'r',s.d.r)}
+<div id="fotos"${s.d.r==='dano'?'':' hidden'}><label class="mut" style="font-weight:600">Fotos de la pieza y del embalaje<input type="file" id="fi" accept="image/*" multiple style="margin-top:6px"></label><div class="thumbs" id="th"></div><p class="mut">Simulación: las fotos no se envían a ningún servidor.</p></div>
+<div class="nav2">${back}<button class="btn dk sm">Continuar</button></div></form>`,
+3:()=>`<form id="rf3"><p class="mut" style="margin-bottom:12px">¿Cómo prefieres que lo resolvamos?</p>${radios(SOL,'s',s.d.s)}<div class="nav2">${back}<button class="btn dk sm">Confirmar solicitud</button></div></form>`,
+4:()=>{
+ const p=prod(s.d.p)||{n:'tu pieza',p:0};
+ const fin=s.d.s==='cambio'?['Cambio enviado','Enviamos '+esc(p.n)+' con embalaje reforzado.']:['Reembolso emitido',money(p.p)+' de regreso a tu método de pago en 5 días hábiles.'];
+ const ST=[['Solicitud recibida','Registramos tu solicitud '+s.d.dev+'.'],['Solicitud aprobada','Generamos tu guía de retorno sin costo.'],['Pieza en camino','La paquetería la traslada a Metepec.'],['Pieza recibida','La revisamos para confirmar que está en buen estado.'],fin];
+ return `<div class="ok"><div class="big">📦</div><h3>Solicitud ${s.d.dev} registrada</h3><p class="mut" style="margin:6px 0 14px">Tu guía de retorno es <b>${s.d.g}</b>. No tiene costo para ti.</p></div>
+<ol class="mut" style="margin:0 0 6px 20px"><li>Embala la pieza en su caja original con papel.</li><li>Pega la guía en el exterior.</li><li>Entrégala en cualquier sucursal de la paquetería.</li></ol>
+<ul class="tl">${ST.map(([t,d],i)=>`<li class="${s.stage===4||i<s.stage?'done':i===s.stage?'cur':''}"><b>${t}</b><small>${d} · ${dt(DAYS[i])}</small></li>`).join('')}</ul>
+${s.stage<4?'<button class="btn sm" data-a="next">Simular siguiente etapa</button>':'<b>✅ Proceso completado.</b>'} <button class="btn sm ghost" data-a="reset">Iniciar otra devolución</button>`}
+};
+function thumbs(){const t=$('#th');if(t)t.innerHTML=s.photos.map(u=>`<img src="${u}" alt="Foto de la pieza">`).join('')}
+function draw(){
+ box.innerHTML=s.step===0
+  ?`<div class="ok"><div class="big">⏳</div><h3>Tu pedido está fuera del plazo</h3><p class="mut" style="margin:8px 0 18px">Aceptamos devoluciones dentro de los 7 días naturales posteriores a la entrega. Escríbenos y revisamos tu caso.</p><a class="btn sm" href="contacto.html">Contactar a METZA</a> <button class="btn sm ghost" data-a="reset">Volver a empezar</button></div>`
+  :head()+V[s.step]();
+ if(s.step===2)thumbs()}
+box.onsubmit=e=>{e.preventDefault();const f=e.target,fd=new FormData(f);
+ if(f.id==='rf1'){s.d.f=String(fd.get('f')).toUpperCase();s.d.p=+fd.get('p');s.d.t=+fd.get('t');s.step=s.d.t===2?0:2}
+ else if(f.id==='rf2'){const r=fd.get('r');if(r==='dano'&&!s.photos.length){toast('Agrega al menos una foto de la pieza dañada');return}s.d.r=r;s.step=3}
+ else if(f.id==='rf3'){s.d.s=fd.get('s');s.d.dev='DEV-'+rnd(6);s.d.g='GR-'+rnd(8);s.stage=0;s.step=4}
+ draw()};
+box.onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
+ if(a==='ej'){box.querySelector('[name=f]').value='MTZ-482913';return}
+ if(a==='back')s.step=Math.max(1,s.step-1);
+ else if(a==='next')s.stage=Math.min(4,s.stage+1);
+ else if(a==='reset')s={step:1,d:{},stage:0,photos:[]};
+ draw()};
+box.onchange=e=>{const t=e.target;
+ if(t.name==='r'){$('#fotos').hidden=t.value!=='dano'}
+ else if(t.id==='fi'){s.photos=[...t.files].map(f=>URL.createObjectURL(f));thumbs()}};
+draw();
+})();
