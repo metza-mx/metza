@@ -3,19 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Simulación de 4 pedidos con embalaje, tiempo de envío y ganancia.">
-<title>Pedidos · METZA</title>
+<meta name="description" content="Consulta tus compras, su envío y tus devoluciones.">
+<title>Mis compras · METZA</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏺</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body data-page="simulacion" data-title="Pedidos">
+<body data-page="compras" data-title="Mis compras">
 <main>
-<div class="ph"><h1>Pedidos</h1><p>Simulación de 4 pedidos: embalaje, tiempo de envío y ganancia.</p></div>
+<div class="ph"><h1>Mis compras</h1><p>Revisa tus pedidos, cuándo llegan y solicita una devolución si algo no salió bien.</p></div>
 <section class="wrap">
-  <p class="mut" style="margin-bottom:26px;max-width:720px">Supuestos: costo de producción de 50% del precio; envío gratis desde $1,000 (si no, lo paga el cliente). Los precios se toman del catálogo.</p>
-  <div class="sim-g" id="sim"></div>
+  <p class="mut" style="margin-bottom:22px">Tus compras se guardan en este navegador.</p>
+  <div class="og" id="orders"></div>
+</section>
+<section class="wrap" id="devs" style="padding-top:0">
+  <h2 style="margin-bottom:22px">Mis devoluciones</h2>
+  <div class="og" id="rets"></div>
 </section>
 </main>
 <script src="app.js"></script>
