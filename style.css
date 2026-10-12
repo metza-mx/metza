@@ -144,3 +144,9 @@ button.em{background:none;border:0;cursor:pointer;width:100%;font-size:74px}
 .bar{height:64px;margin:12px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:repeating-linear-gradient(90deg,#222 0 2px,#fff 2px 4px,#222 4px 7px,#fff 7px 9px,#222 9px 10px,#fff 10px 13px,#222 13px 16px,#fff 16px 17px)}
 @media print{body:has(#mLbl.open)>*:not(#mLbl){display:none!important}
  #mLbl.open{position:static;background:none;padding:0}#mLbl .mh,#mLbl .btn{display:none!important}#mLbl .box{max-height:none}}
+
+.emb{display:grid;grid-template-columns:220px 1fr;gap:30px;align-items:center;border-top:6px solid var(--tc)}
+@media(max-width:700px){.emb{grid-template-columns:1fr}}
+.emb-art{font-size:110px;text-align:center;background:var(--cream);border-radius:16px;padding:34px 0}
+.emb-l{margin:14px 0 0 20px;color:#4a3f36}.emb-l li{margin:8px 0}
+footer .fe{margin-top:12px;color:#e9d8c6}footer .fe a{color:#fff;font-weight:600}

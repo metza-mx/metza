@@ -8,7 +8,8 @@ document.body.insertAdjacentHTML('afterbegin',`<header><div class="hd">
 <div class="ic"><button id="bCart" aria-label="Abrir carrito">🛍️<span id="cnt">0</span></button></div>
 </div></header>`);
 document.body.insertAdjacentHTML('beforeend',`
-<footer><b id="fbrand"></b><span id="femail"></span><br>Hecho con orgullo en Metepec, Estado de México</footer>
+<footer><b id="fbrand"></b><span id="femail"></span><br>Hecho con orgullo en Metepec, Estado de México
+<p class="fe">📦 Cada pieza viaja protegida con embalaje resistente y amortiguador. <a href="pagos.html#embalaje">Envíos y embalaje seguro</a></p></footer>
 <div class="ov" id="ov"></div>
 <aside class="drawer" id="drawer" aria-label="Carrito">
 <div class="mh"><h2>Tu carrito</h2><button class="x" data-close aria-label="Cerrar">✕</button></div>
