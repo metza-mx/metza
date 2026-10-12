@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" role="img" aria-label="Vasija de barro envuelta en plástico de burbujas dentro de una caja de cartón">
+<defs>
+  <pattern id="bub" width="20" height="20" patternUnits="userSpaceOnUse">
+    <circle cx="10" cy="10" r="7.5" fill="#ffffff" fill-opacity=".3" stroke="#ffffff" stroke-opacity=".95" stroke-width="1.4"/>
+    <circle cx="7.5" cy="7.5" r="2" fill="#fff"/>
+  </pattern>
+  <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efe5d8"/><stop offset="1" stop-color="#e5d6c3"/></linearGradient>
+  <linearGradient id="vase" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a94f2c"/><stop offset=".42" stop-color="#d77a4f"/><stop offset="1" stop-color="#97431f"/></linearGradient>
+</defs>
+<rect width="800" height="460" fill="url(#wall)"/>
+<rect y="360" width="800" height="100" fill="#f6f0e7"/>
+<rect y="358" width="800" height="3" fill="#e2d4c1"/>
+<ellipse cx="400" cy="428" rx="240" ry="16" fill="#5c3a21" opacity=".13"/>
+<!-- solapas traseras e interior -->
+<polygon points="210,255 590,255 625,165 255,172" fill="#c99560"/>
+<polygon points="190,300 210,255 140,185 118,236" fill="#bb8550"/>
+<polygon points="210,255 590,255 570,300 190,300" fill="#7f5329"/>
+<!-- vasija de barro -->
+<path d="M345 70 h90 v14 c0 10 -10 14 -10 24 c0 16 60 40 60 105 c0 60 -40 110 -95 110 c-55 0 -95 -50 -95 -110 c0 -65 60 -89 60 -105 c0 -10 -10 -14 -10 -24z" fill="url(#vase)"/>
+<ellipse cx="390" cy="70" rx="45" ry="8" fill="#6e2e15"/>
+<path d="M352 140 q38 -16 76 0" fill="none" stroke="#f7e3c8" stroke-width="4" stroke-linecap="round"/>
+<path d="M318 178 q72 -26 144 0" fill="none" stroke="#f7e3c8" stroke-width="5" stroke-linecap="round"/>
+<g fill="#f7e3c8"><circle cx="340" cy="196" r="5"/><circle cx="365" cy="190" r="4"/><circle cx="390" cy="188" r="6"/><circle cx="415" cy="190" r="4"/><circle cx="440" cy="196" r="5"/></g>
+<!-- plástico de burbujas -->
+<path d="M296 214 c40 -34 148 -34 188 0 l18 100 h-224z" fill="url(#bub)"/>
+<path d="M296 214 c40 -34 148 -34 188 0 l18 100 h-224z" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-opacity=".85" stroke-width="2"/>
+<!-- frente de la caja -->
+<polygon points="570,300 610,255 610,375 570,420" fill="#a87140"/>
+<polygon points="190,300 570,300 570,420 190,420" fill="#c98f58"/>
+<polygon points="570,300 610,255 672,288 632,338" fill="#c08650"/>
+<polygon points="190,300 570,300 588,326 172,326" fill="#dcaa74"/>
+<rect x="232" y="350" width="124" height="44" rx="4" fill="#f6efe4"/>
+<text x="294" y="370" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="700" fill="#b23a30" text-anchor="middle">FRÁGIL</text>
+<text x="294" y="386" font-family="Inter,Arial,sans-serif" font-size="9.5" fill="#5c3a21" text-anchor="middle">MANÉJESE CON CUIDADO</text>
+<g stroke="#5c3a21" stroke-width="2.5" fill="none" stroke-linecap="round" transform="translate(478 352)"><path d="M10 34 v-22 M2 18 l8 -8 l8 8"/><path d="M38 34 v-22 M30 18 l8 -8 l8 8"/></g>
+<!-- relleno -->
+<g fill="#fff" stroke="#e5d9cb"><rect x="52" y="378" width="76" height="36" rx="6"/><rect x="64" y="350" width="76" height="34" rx="6"/></g>
+<!-- despachador de cinta -->
+<g transform="translate(655 340)">
+  <path d="M0 80 h110 l-10 -40 h-60 z" fill="#2b2622"/>
+  <circle cx="58" cy="30" r="34" fill="#e9dcc4" stroke="#cdbb9c" stroke-width="3"/>
+  <circle cx="58" cy="30" r="16" fill="#f6f0e7"/>
+  <path d="M100 40 l16 -6 l2 10 z" fill="#8a8a8a"/>
+</g>
+</svg>
