@@ -286,3 +286,6 @@ button.em{height:170px;padding:0;display:grid;place-items:center}
 [data-fx] .pic.fx{height:100%;max-width:100%;object-fit:contain;border-radius:0}
 .big2[data-fx]{padding:0;height:200px;display:grid;place-items:center}
 .pr{gap:8px}.pr span{display:flex;gap:6px;flex-shrink:0}
+.hero-art a{overflow:hidden}
+.hero-art img{width:78%;height:78%;object-fit:contain;mix-blend-mode:multiply}
+.hero-art a.cov img{width:100%;height:100%;object-fit:cover;mix-blend-mode:normal}
