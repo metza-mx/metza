@@ -12,35 +12,62 @@
 </head>
 <body data-page="inicio">
 <main>
-<section class="hero">
-  <h1 id="heroT"></h1>
-  <p id="heroP"></p>
-  <a class="btn" href="catalogo.html">Ver colección</a>
+<section class="hero"><div class="hero-in">
+  <div>
+    <p class="eye">ARTESANÍAS DE METEPEC</p>
+    <h1 id="heroT"></h1>
+    <p id="heroP"></p>
+    <div class="hero-b"><a class="btn" href="catalogo.html">Ver colección</a><a class="btn ghost" href="#nosotros">Conócenos</a></div>
+  </div>
+  <div class="hero-art">
+    <a href="catalogo.html?cat=%C3%81rbol%20de%20la%20Vida" style="--t:#e4eed8" aria-label="Árbol de la Vida">🌳</a>
+    <a href="catalogo.html?cat=Catrinas" style="--t:#f8e0da" aria-label="Catrinas">💀</a>
+    <a href="catalogo.html?cat=Tlanchanas" style="--t:#d9eaec" aria-label="Tlanchanas">🧜</a>
+    <a href="catalogo.html?cat=Barro" style="--t:#f4e1cc" aria-label="Barro">🏺</a>
+  </div>
+</div></section>
+
+<div class="wrap trust">
+  <div><i aria-hidden="true">✋</i><span><b>Hecho a mano</b>Por artesanos de Metepec</span></div>
+  <div><i aria-hidden="true">📦</i><span><b>Embalaje seguro</b>Cada pieza viaja protegida</span></div>
+  <div><i aria-hidden="true">↩️</i><span><b>7 días</b>Para devoluciones en línea</span></div>
+  <div><i aria-hidden="true">🚚</i><span><b>Envío gratis</b>En compras desde $1,000</span></div>
+</div>
+
+<section class="wrap">
+  <div class="sh"><h2>Explora por categoría</h2><a href="catalogo.html">Ver todo el catálogo →</a></div>
+  <div class="cats" id="catTiles"></div>
 </section>
 
-<div class="wrap" style="padding-bottom:0">
+<section class="wrap" style="padding-top:0">
+  <div class="sh"><h2>Piezas destacadas</h2><a href="catalogo.html">Ver más →</a></div>
+  <div class="grid" id="grid" data-limit="4"></div>
+</section>
+
+<div class="wrap" style="padding-top:0">
   <div class="bn" aria-label="Banners de publicidad">
     <div class="slide on">
-      <div><h3>Conoce METZA</h3><p>Artesanías de Metepec hechas a mano. Cada pieza lleva una historia, una tradición y una identidad cultural.</p></div>
-      <a class="btn" href="#nosotros">Conocer la empresa</a>
-    </div>
-    <div class="slide">
       <div><h3>🎁 Promoción de temporada</h3><p>Usa el código <b>METZA10</b> y obtén 10% de descuento. Envío gratis en compras desde $1,000.</p></div>
       <a class="btn" href="catalogo.html">Aprovechar promoción</a>
+    </div>
+    <div class="slide">
+      <div><h3>Conoce METZA</h3><p>Artesanías de Metepec hechas a mano. Cada pieza lleva una historia, una tradición y una identidad cultural.</p></div>
+      <a class="btn" href="#nosotros">Conocer la empresa</a>
     </div>
   </div>
   <div class="dots" id="dots"><i class="on"></i><i></i></div>
 </div>
 
-<section id="nosotros" class="wrap">
-  <p class="eye">NUESTRA ESENCIA</p>
-  <p class="about" id="about"></p>
-</section>
-
-<section class="wrap" style="padding-top:0">
-  <h2 style="margin-bottom:26px">Piezas destacadas</h2>
-  <div class="grid" id="grid" data-limit="4"></div>
-  <div class="more"><a class="btn" href="catalogo.html">Ver todo el catálogo</a></div>
+<section id="nosotros" class="alt">
+  <div class="wrap">
+    <p class="eye">NUESTRA ESENCIA</p>
+    <p class="about" id="about"></p>
+    <div class="how">
+      <div><i aria-hidden="true">🛍️</i><h3>Elige tu pieza</h3><p>Explora el catálogo y agrega al carrito las artesanías que más te gusten.</p></div>
+      <div><i aria-hidden="true">💳</i><h3>Paga como prefieras</h3><p>Tarjeta, transferencia, OXXO o Mercado Pago. Usa METZA10 para tu descuento.</p></div>
+      <div><i aria-hidden="true">📦</i><h3>Recíbela en casa</h3><p>La empacamos con cuidado y sigues tu pedido desde Mis compras.</p></div>
+    </div>
+  </div>
 </section>
 </main>
 <script src="app.js"></script>

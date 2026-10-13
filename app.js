@@ -4,12 +4,17 @@ const P=document.body.dataset.page;
 const L=[['index.html','inicio','Inicio'],['catalogo.html','catalogo','Catálogo'],['mis-compras.html','compras','Mis compras'],['devoluciones.html','devoluciones','Devoluciones'],['pagos.html','pagos','Pagos y envíos'],['contacto.html','contacto','Contacto']];
 document.body.insertAdjacentHTML('afterbegin',`<header><div class="hd">
 <a href="index.html" class="logo"><b id="brand"></b><small id="tag"></small></a>
-<nav>${L.map(([h,k,t])=>`<a href="${h}"${k===P?' class="act" aria-current="page"':''}>${t}</a>`).join('')}</nav>
-<div class="ic"><button id="bCart" aria-label="Abrir carrito">🛍️<span id="cnt">0</span></button></div>
+<nav id="nav">${L.map(([h,k,t])=>`<a href="${h}"${k===P?' class="act" aria-current="page"':''}>${t}</a>`).join('')}</nav>
+<div class="ic"><button id="bCart" aria-label="Abrir carrito">🛍️<span id="cnt">0</span></button><button id="bMenu" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">☰</button></div>
 </div></header>`);
 document.body.insertAdjacentHTML('beforeend',`
-<footer><b id="fbrand"></b><span id="femail"></span><br>Hecho con orgullo en Metepec, Estado de México
-<p class="fe">📦 Cada pieza viaja protegida con embalaje resistente y amortiguador. <a href="pagos.html#embalaje">Envíos y embalaje seguro</a></p></footer>
+<footer><div class="ft">
+<div><b id="fbrand"></b>Artesanías de Metepec hechas a mano. Cada pieza lleva una historia, una tradición y una identidad cultural.
+<p class="fe">📦 Cada pieza viaja protegida con embalaje resistente y amortiguador. <a href="pagos.html#embalaje">Envíos y embalaje seguro</a></p></div>
+<div><h4>Tienda</h4><a href="catalogo.html">Catálogo</a><a href="index.html#nosotros">Nosotros</a><a href="catalogo.html?cat=Catrinas">Catrinas</a><a href="catalogo.html?cat=Barro">Barro</a></div>
+<div><h4>Ayuda</h4><a href="mis-compras.html">Mis compras</a><a href="devoluciones.html">Devoluciones</a><a href="pagos.html">Pagos y envíos</a></div>
+<div><h4>Contacto</h4><a id="femail" href="mailto:hola@metza.mx"></a><span>Metepec, Estado de México</span><a href="contacto.html">Escríbenos</a></div>
+</div><div class="fb">© ${new Date().getFullYear()} METZA · Hecho con orgullo en Metepec, Estado de México</div></footer>
 <div class="ov" id="ov"></div>
 <aside class="drawer" id="drawer" aria-label="Carrito">
 <div class="mh"><h2>Tu carrito</h2><button class="x" data-close aria-label="Cerrar">✕</button></div>
@@ -49,6 +54,7 @@ products:[
 {id:11,e:'🎭',c:'Catrinas',n:'Catrina Elegante',d:'Catrina con sombrero y vestido detallado a mano.',p:780},
 {id:12,e:'🍲',c:'Barro',n:'Cazuela de Barro',d:'Cazuela para cocinar y servir, de barro tradicional.',p:310}]};
 
+const TINT={'Árbol de la Vida':'#e4eed8','Catrinas':'#f8e0da','Tlanchanas':'#d9eaec','Barro':'#f4e1cc'};
 const PAYS=['💳 Tarjeta de crédito o débito','🏦 Transferencia bancaria (SPEI)','🏪 Pago en efectivo en OXXO','📱 Mercado Pago'],
 ZN=[['Metepec / Toluca','1 día',1],['CDMX y Edomex','2–3 días',3],['Resto del país','4–6 días',6]];
 
@@ -106,17 +112,27 @@ function renderTexts(){
   document.title=document.body.dataset.title?document.body.dataset.title+' · '+cfg.brand:cfg.brand+' · '+cfg.tag;
   $('#brand').textContent=cfg.brand;$('#tag').textContent=cfg.tag;
   [['#heroT','heroT'],['#heroP','heroP'],['#about','about']].forEach(([s,k])=>{const e=$(s);if(e)e.textContent=cfg[k]});
-  $('#fbrand').textContent=cfg.brand;$('#femail').textContent=cfg.email}
-function renderCats(){if(!$('#cat'))return;
-  const cs=[...new Set(cfg.products.map(p=>p.c))],cur=$('#cat').value;
-  $('#cat').innerHTML='<option value="">Todas las categorías</option>'+cs.map(c=>`<option>${esc(c)}</option>`).join('');
-  $('#cat').value=cur}
+  $('#fbrand').textContent=cfg.brand;$('#femail').textContent=cfg.email;$('#femail').href='mailto:'+cfg.email}
+const CATS=[...new Set(cfg.products.map(p=>p.c))];
+let fcat=new URLSearchParams(location.search).get('cat')||'';
+if(!CATS.includes(fcat))fcat='';
+function renderCats(){
+  const t=$('#catTiles');
+  if(t)t.innerHTML=CATS.map(c=>{const L=cfg.products.filter(p=>p.c===c);
+    return `<a class="cat" style="--t:${TINT[c]}" href="catalogo.html?cat=${encodeURIComponent(c)}"><span aria-hidden="true">${L[0].e}</span><b>${esc(c)}</b><small>${L.length} piezas · desde ${money(Math.min(...L.map(p=>p.p)))}</small></a>`}).join('');
+  const c=$('#cats');
+  if(c)c.innerHTML=['',...CATS].map(x=>`<button class="pill${x===fcat?' on':''}" data-cat="${esc(x)}" aria-pressed="${x===fcat}">${x?esc(x):'Todas'}</button>`).join('')}
 function renderGrid(){const g=$('#grid');if(!g)return;
-  const f=$('#cat')?$('#cat').value:'',lim=+g.dataset.limit||99;
-  g.innerHTML=cfg.products.filter(p=>!f||p.c===f).slice(0,lim).map(p=>`
-  <article class="card prod"><button class="em" data-view="${p.id}" aria-label="Ver detalle de ${esc(p.n)}">${p.e}</button>
+  const q=($('#q')?$('#q').value:'').trim().toLowerCase(),so=$('#sort')?$('#sort').value:'',lim=+g.dataset.limit||99;
+  let L=cfg.products.filter(p=>(!fcat||p.c===fcat)&&(!q||(p.n+' '+p.d+' '+p.c).toLowerCase().includes(q)));
+  if(so)L=[...L].sort((a,b)=>so==='asc'?a.p-b.p:b.p-a.p);
+  L=L.slice(0,lim);
+  if($('#count'))$('#count').textContent=L.length+(L.length===1?' pieza':' piezas');
+  g.innerHTML=L.length?L.map(p=>`
+  <article class="card prod"><button class="em" style="--t:${TINT[p.c]}" data-view="${p.id}" aria-label="Ver detalle de ${esc(p.n)}">${p.e}</button>
   <span class="chip">${esc(p.c.toUpperCase())}</span><h3>${esc(p.n)}</h3><p>${esc(p.d)}</p>
-  <div class="pr"><b>${money(p.p)}</b><span><button class="btn sm ghost" data-view="${p.id}">Ver</button> <button class="btn sm" data-add="${p.id}">Agregar</button></span></div></article>`).join('')}
+  <div class="pr"><b>${money(p.p)}</b><span><button class="btn sm ghost" data-view="${p.id}">Ver</button> <button class="btn sm" data-add="${p.id}">Agregar</button></span></div></article>`).join('')
+  :'<p class="empty">No encontramos piezas con esa búsqueda. <button class="lnk2" data-cat="">Ver todo el catálogo</button></p>'}
 function renderCart(){
   const ids=Object.keys(cart).filter(id=>prod(id)),t=totals();
   $('#cnt').textContent=ids.reduce((a,id)=>a+cart[id],0);
@@ -158,7 +174,7 @@ function renderRets(){const c=$('#rets');if(!c)return;
 function openDrawer(){$('#drawer').classList.add('open');$('#ov').classList.add('open')}
 function closeAll(){$$('.modal,.drawer,.ov').forEach(e=>e.classList.remove('open'))}
 function openProd(id){const p=prod(id);
-  $('#prodBody').innerHTML=`<div class="pd"><div class="big2" aria-hidden="true">${p.e}</div><div>
+  $('#prodBody').innerHTML=`<div class="pd"><div class="big2" style="background:${TINT[p.c]}" aria-hidden="true">${p.e}</div><div>
   <span class="chip">${esc(p.c.toUpperCase())}</span><h2 style="margin:8px 0">${esc(p.n)}</h2><p>${esc(p.d)}</p><b class="pp">${money(p.p)}</b>
   <ul class="mut feats"><li>✋ Hecha a mano en Metepec; cada pieza es única.</li><li>📦 Llega en 1 a 6 días según tu zona; envío gratis desde $1,000.</li><li>↩️ Tienes ${RET_DAYS} días para devolverla.</li></ul>
   <div class="pr"><span class="q"><button data-pq="-1" aria-label="Menos">−</button><span id="pq">1</span><button data-pq="1" aria-label="Más">+</button></span><button class="btn" data-addq="${p.id}">Agregar al carrito</button></div></div></div>`;
@@ -181,6 +197,8 @@ document.addEventListener('click',e=>{
   else if(d.inc){cart[d.inc]++;renderCart()}
   else if(d.dec){if(--cart[d.dec]<1)delete cart[d.dec];renderCart()}
   else if(d.del){delete cart[d.del];renderCart()}
+  else if('cat' in d){fcat=d.cat;if($('#q')&&!fcat)$('#q').value='';renderCats();renderGrid();
+    history.replaceState(null,'',fcat?'?cat='+encodeURIComponent(fcat):location.pathname)}
   else if(d.rebuy){findO(d.rebuy).items.forEach(i=>cart[i.id]=(cart[i.id]||0)+i.q);renderCart();openDrawer()}
   else if(d.lbl)showLabel(d.lbl);
   else if(d.cancel){if(!confirm('¿Cancelar la solicitud '+d.cancel+'? Las piezas volverán a estar disponibles para devolución.'))return;
@@ -194,7 +212,9 @@ $('#bCart').onclick=openDrawer;
 $('#ov').onclick=closeAll;
 $$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeAll()}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
-if($('#cat'))$('#cat').onchange=renderGrid;
+if($('#q'))$('#q').oninput=renderGrid;
+if($('#sort'))$('#sort').onchange=renderGrid;
+$('#bMenu').onclick=()=>{const h=$('header'),o=h.classList.toggle('open');$('#bMenu').setAttribute('aria-expanded',o);$('#bMenu').textContent=o?'✕':'☰'};
 
 /* ---------- Pago (simulado) ---------- */
 function openPay(){
