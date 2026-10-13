@@ -56,24 +56,26 @@ heroP:'Descubre piezas inspiradas en la tradición artesanal de Metepec y lléva
 about:'Somos una marca dedicada a la comercialización y difusión de artesanías de Metepec. Buscamos conectar a las personas con piezas que cuentan una historia, una tradición y una identidad cultural.',
 email:'hola@metza.mx',
 products:[
-{id:1,e:'🌳',c:'Árbol de la Vida',n:'Árbol de la Vida',d:'Pieza decorativa inspirada en una tradición representativa de Metepec.',p:850},
-{id:2,e:'💀',c:'Catrinas',n:'Catrina de Barro',d:'Figura decorativa con detalles inspirados en la tradición artesanal.',p:620},
-{id:3,e:'🧜',c:'Tlanchanas',n:'Tlanchana',d:'Pieza inspirada en la figura tradicional de la Tlanchana.',p:540},
+{id:1,e:'🌳',img:'img/productos/arbol-de-la-vida.jpg',fx:1,c:'Árbol de la Vida',n:'Árbol de la Vida',d:'Pieza decorativa inspirada en una tradición representativa de Metepec.',p:850},
+{id:2,e:'💀',img:'img/productos/catrina-de-barro.jpg',c:'Catrinas',n:'Catrina de Barro',d:'Figura decorativa con detalles inspirados en la tradición artesanal.',p:620},
+{id:3,e:'🧜',img:'img/productos/tlanchana.jpg',fx:1,c:'Tlanchanas',n:'Tlanchana',d:'Pieza inspirada en la figura tradicional de la Tlanchana.',p:540},
 {id:4,e:'🏺',img:'img/productos/vasija-de-barro.png',c:'Barro',n:'Vasija de Barro',d:'Pieza de barro para decoración, con carácter artesanal.',p:390},
-{id:5,e:'🌱',c:'Árbol de la Vida',n:'Mini Árbol',d:'Versión compacta del árbol, ideal para escritorio o repisa.',p:280},
-{id:6,e:'🌸',c:'Catrinas',n:'Catrina Floral',d:'Catrina con acabados florales pintados a mano.',p:690},
-{id:7,e:'🐚',c:'Tlanchanas',n:'Tlanchana Mini',d:'Tlanchana pequeña, perfecta para regalo.',p:320},
-{id:8,e:'🫖',c:'Barro',n:'Jarra de Barro',d:'Jarra tradicional de barro cocido, con acabado natural.',p:450},
-{id:9,e:'🪴',c:'Barro',n:'Maceta Artesanal',d:'Maceta de barro decorada a mano para tus plantas.',p:260},
-{id:10,e:'🌲',c:'Árbol de la Vida',n:'Árbol de la Vida Grande',d:'Pieza de gran formato, protagonista de cualquier espacio.',p:1450},
-{id:11,e:'🎭',c:'Catrinas',n:'Catrina Elegante',d:'Catrina con sombrero y vestido detallado a mano.',p:780},
-{id:12,e:'🍲',c:'Barro',n:'Cazuela de Barro',d:'Cazuela para cocinar y servir, de barro tradicional.',p:310}]};
+{id:5,e:'🌱',img:'img/productos/mini-arbol.jpg',fx:1,c:'Árbol de la Vida',n:'Mini Árbol',d:'Versión compacta del árbol, ideal para escritorio o repisa.',p:280},
+{id:6,e:'🌸',img:'img/productos/catrina-floral.jpg',c:'Catrinas',n:'Catrina Floral',d:'Catrina con acabados florales pintados a mano.',p:690},
+{id:7,e:'🐚',img:'img/productos/tlanchana-mini.jpg',fx:1,c:'Tlanchanas',n:'Tlanchana Mini',d:'Tlanchana pequeña, perfecta para regalo.',p:320},
+{id:8,e:'🫖',img:'img/productos/jarra-de-barro.jpg',c:'Barro',n:'Jarra de Barro',d:'Jarra tradicional de barro cocido, con acabado natural.',p:450},
+{id:9,e:'🪴',img:'img/productos/maceta-artesanal.jpg',c:'Barro',n:'Maceta Artesanal',d:'Maceta de barro decorada a mano para tus plantas.',p:260},
+{id:10,e:'🌲',img:'img/productos/arbol-de-la-vida-grande.jpg',fx:1,c:'Árbol de la Vida',n:'Árbol de la Vida Grande',d:'Pieza de gran formato, protagonista de cualquier espacio.',p:1450},
+{id:11,e:'🎭',img:'img/productos/catrina-elegante.jpg',c:'Catrinas',n:'Catrina Elegante',d:'Catrina con sombrero y vestido detallado a mano.',p:780},
+{id:12,e:'🍲',img:'img/productos/cazuela-de-barro.jpg',c:'Barro',n:'Cazuela de Barro',d:'Cazuela para cocinar y servir, de barro tradicional.',p:310}]};
 
 /* Cambios del admin a productos (precio y disponibilidad) */
 const prodOv=ls.get('metza_prod',{});
 cfg.products.forEach(p=>{p.p0=p.p;Object.assign(p,prodOv[p.id]||{})});
-/* Foto del producto si tiene (campo img); si no, su emoji */
-const pic=p=>p.img?`<img class="pic" src="${p.img}" alt="" loading="lazy">`:p.e;
+/* Foto del producto si tiene (campo img); si no, su emoji.
+   fx:1 marca fotos con fondo propio: se muestran sobre esa misma foto difuminada. */
+const pic=p=>p.img?`<img class="pic${p.fx?' fx':''}" src="${p.img}" alt="" loading="lazy">`:p.e;
+const picBg=p=>p.fx?` data-fx style="--ph:url('${p.img}')"`:'';
 const TINT={'Árbol de la Vida':'#e4eed8','Catrinas':'#f8e0da','Tlanchanas':'#d9eaec','Barro':'#f4e1cc'};
 const PAYS=['💳 Tarjeta de crédito o débito','🏦 Transferencia bancaria (SPEI)','🏪 Pago en efectivo en OXXO','📱 Mercado Pago'],
 ZN=[['Metepec / Toluca','1 día',1],['CDMX y Edomex','2–3 días',3],['Resto del país','4–6 días',6]];
@@ -157,7 +159,7 @@ function renderGrid(){const g=$('#grid');if(!g)return;
   L=L.slice(0,lim);
   if($('#count'))$('#count').textContent=L.length+(L.length===1?' pieza':' piezas');
   g.innerHTML=L.length?L.map(p=>`
-  <article class="card prod"><button class="em" style="--t:${TINT[p.c]}" data-view="${p.id}" aria-label="Ver detalle de ${esc(p.n)}">${pic(p)}</button>
+  <article class="card prod"><button class="em" style="--t:${TINT[p.c]}"${picBg(p)} data-view="${p.id}" aria-label="Ver detalle de ${esc(p.n)}">${pic(p)}</button>
   <span class="chip">${esc(p.c.toUpperCase())}</span><h3>${esc(p.n)}</h3><p>${esc(p.d)}</p>
   <div class="pr"><b>${money(p.p)}</b><span><button class="btn sm ghost" data-view="${p.id}">Ver</button> ${p.off?'<button class="btn sm" disabled>Agotado</button>':`<button class="btn sm" data-add="${p.id}">Agregar</button>`}</span></div></article>`).join('')
   :'<p class="empty">No encontramos piezas con esa búsqueda. <button class="lnk2" data-cat="">Ver todo el catálogo</button></p>'}
@@ -205,7 +207,7 @@ function renderRets(){const c=$('#rets');if(!c)return;
 function openDrawer(){$('#drawer').classList.add('open');$('#ov').classList.add('open')}
 function closeAll(){$$('.modal,.drawer,.ov').forEach(e=>e.classList.remove('open'))}
 function openProd(id){const p=prod(id);
-  $('#prodBody').innerHTML=`<div class="pd"><div class="big2" style="background:${TINT[p.c]}" aria-hidden="true">${pic(p)}</div><div>
+  $('#prodBody').innerHTML=`<div class="pd"><div class="big2" style="background:${TINT[p.c]}" aria-hidden="true"${picBg(p)}>${pic(p)}</div><div>
   <span class="chip">${esc(p.c.toUpperCase())}</span><h2 style="margin:8px 0">${esc(p.n)}</h2><p>${esc(p.d)}</p><b class="pp">${money(p.p)}</b>
   <ul class="mut feats"><li>✋ Hecha a mano en Metepec; cada pieza es única.</li><li>📦 Llega en 1 a 6 días según tu zona; envío gratis desde $1,000.</li><li>↩️ Tienes ${RET_DAYS} días para devolverla.</li></ul>
   <div class="pr"><span class="q"><button data-pq="-1" aria-label="Menos">−</button><span id="pq">1</span><button data-pq="1" aria-label="Más">+</button></span>${p.off?'<button class="btn" disabled>Agotado</button>':`<button class="btn" data-addq="${p.id}">Agregar al carrito</button>`}</div></div></div>`;

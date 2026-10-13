@@ -280,3 +280,9 @@ body.admin{background:#faf6f1}
 button.em{height:170px;padding:0;display:grid;place-items:center}
 .em .pic{width:auto;height:140px;max-width:90%}
 .big2 .pic{width:auto;height:1.6em;max-width:100%}
+.pic.fx{object-fit:cover;border-radius:6px;mix-blend-mode:normal}
+[data-fx]{position:relative;overflow:hidden;isolation:isolate}
+[data-fx]::before{content:'';position:absolute;inset:-24px;z-index:-1;background:var(--ph) center/cover;filter:blur(18px) saturate(1.1);opacity:.85}
+[data-fx] .pic.fx{height:100%;max-width:100%;object-fit:contain;border-radius:0}
+.big2[data-fx]{padding:0;height:200px;display:grid;place-items:center}
+.pr{gap:8px}.pr span{display:flex;gap:6px;flex-shrink:0}
