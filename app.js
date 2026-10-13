@@ -59,7 +59,7 @@ products:[
 {id:1,e:'🌳',c:'Árbol de la Vida',n:'Árbol de la Vida',d:'Pieza decorativa inspirada en una tradición representativa de Metepec.',p:850},
 {id:2,e:'💀',c:'Catrinas',n:'Catrina de Barro',d:'Figura decorativa con detalles inspirados en la tradición artesanal.',p:620},
 {id:3,e:'🧜',c:'Tlanchanas',n:'Tlanchana',d:'Pieza inspirada en la figura tradicional de la Tlanchana.',p:540},
-{id:4,e:'🏺',c:'Barro',n:'Vasija de Barro',d:'Pieza de barro para decoración, con carácter artesanal.',p:390},
+{id:4,e:'🏺',img:'img/productos/vasija-de-barro.png',c:'Barro',n:'Vasija de Barro',d:'Pieza de barro para decoración, con carácter artesanal.',p:390},
 {id:5,e:'🌱',c:'Árbol de la Vida',n:'Mini Árbol',d:'Versión compacta del árbol, ideal para escritorio o repisa.',p:280},
 {id:6,e:'🌸',c:'Catrinas',n:'Catrina Floral',d:'Catrina con acabados florales pintados a mano.',p:690},
 {id:7,e:'🐚',c:'Tlanchanas',n:'Tlanchana Mini',d:'Tlanchana pequeña, perfecta para regalo.',p:320},
@@ -72,6 +72,8 @@ products:[
 /* Cambios del admin a productos (precio y disponibilidad) */
 const prodOv=ls.get('metza_prod',{});
 cfg.products.forEach(p=>{p.p0=p.p;Object.assign(p,prodOv[p.id]||{})});
+/* Foto del producto si tiene (campo img); si no, su emoji */
+const pic=p=>p.img?`<img class="pic" src="${p.img}" alt="" loading="lazy">`:p.e;
 const TINT={'Árbol de la Vida':'#e4eed8','Catrinas':'#f8e0da','Tlanchanas':'#d9eaec','Barro':'#f4e1cc'};
 const PAYS=['💳 Tarjeta de crédito o débito','🏦 Transferencia bancaria (SPEI)','🏪 Pago en efectivo en OXXO','📱 Mercado Pago'],
 ZN=[['Metepec / Toluca','1 día',1],['CDMX y Edomex','2–3 días',3],['Resto del país','4–6 días',6]];
@@ -145,7 +147,7 @@ if(!CATS.includes(fcat))fcat='';
 function renderCats(){
   const t=$('#catTiles');
   if(t)t.innerHTML=CATS.map(c=>{const L=cfg.products.filter(p=>p.c===c);
-    return `<a class="cat" style="--t:${TINT[c]}" href="catalogo.html?cat=${encodeURIComponent(c)}"><span aria-hidden="true">${L[0].e}</span><b>${esc(c)}</b><small>${L.length} piezas · desde ${money(Math.min(...L.map(p=>p.p)))}</small></a>`}).join('');
+    return `<a class="cat" style="--t:${TINT[c]}" href="catalogo.html?cat=${encodeURIComponent(c)}"><span aria-hidden="true">${pic(L[0])}</span><b>${esc(c)}</b><small>${L.length} piezas · desde ${money(Math.min(...L.map(p=>p.p)))}</small></a>`}).join('');
   const c=$('#cats');
   if(c)c.innerHTML=['',...CATS].map(x=>`<button class="pill${x===fcat?' on':''}" data-cat="${esc(x)}" aria-pressed="${x===fcat}">${x?esc(x):'Todas'}</button>`).join('')}
 function renderGrid(){const g=$('#grid');if(!g)return;
@@ -155,7 +157,7 @@ function renderGrid(){const g=$('#grid');if(!g)return;
   L=L.slice(0,lim);
   if($('#count'))$('#count').textContent=L.length+(L.length===1?' pieza':' piezas');
   g.innerHTML=L.length?L.map(p=>`
-  <article class="card prod"><button class="em" style="--t:${TINT[p.c]}" data-view="${p.id}" aria-label="Ver detalle de ${esc(p.n)}">${p.e}</button>
+  <article class="card prod"><button class="em" style="--t:${TINT[p.c]}" data-view="${p.id}" aria-label="Ver detalle de ${esc(p.n)}">${pic(p)}</button>
   <span class="chip">${esc(p.c.toUpperCase())}</span><h3>${esc(p.n)}</h3><p>${esc(p.d)}</p>
   <div class="pr"><b>${money(p.p)}</b><span><button class="btn sm ghost" data-view="${p.id}">Ver</button> ${p.off?'<button class="btn sm" disabled>Agotado</button>':`<button class="btn sm" data-add="${p.id}">Agregar</button>`}</span></div></article>`).join('')
   :'<p class="empty">No encontramos piezas con esa búsqueda. <button class="lnk2" data-cat="">Ver todo el catálogo</button></p>'}
@@ -163,7 +165,7 @@ function renderCart(){if(!$('#cnt'))return;
   const ids=Object.keys(cart).filter(id=>prod(id)),t=totals();
   $('#cnt').textContent=ids.reduce((a,id)=>a+cart[id],0);
   $('#cartBody').innerHTML=ids.length?ids.map(id=>{const p=prod(id);return `
-  <div class="ci"><span class="e">${p.e}</span><div><b>${esc(p.n)}</b><br>${money(p.p)}</div>
+  <div class="ci"><span class="e">${pic(p)}</span><div><b>${esc(p.n)}</b><br>${money(p.p)}</div>
   <span class="q"><button data-dec="${id}" aria-label="Quitar uno">−</button>${cart[id]}<button data-inc="${id}" aria-label="Agregar uno">+</button></span>
   <button class="x" data-del="${id}" aria-label="Eliminar">✕</button></div>`}).join(''):'<p>Tu carrito está vacío. Agrega piezas desde el catálogo.</p>';
   $('#cartFoot').innerHTML=`
@@ -178,7 +180,7 @@ function renderOrders(){const c=$('#orders');if(!c)return;
   const L=mine();
   c.innerHTML=L.length?L.slice().reverse().map(o=>{const [s,k]=oStatus(o),[ok,msg]=canReturn(o);
   return `<article class="card oc"><div class="oh"><div><h3>${o.folio}${o.demo?' <span class="chip">EJEMPLO</span>':''}</h3><span class="mut">Comprado el ${fdate(o.date)}</span></div><span class="bd ${k}">${s}</span></div>
-  ${o.items.map(i=>{const p=prod(i.id),rq=retQ(o.folio,i.id);return `<div class="ol"><span class="e2">${p.e}</span><span style="flex:1">${i.q}× ${esc(p.n)}${rq?` <small class="mut">(${rq} en devolución)</small>`:''}</span><b>${money(i.p*i.q)}</b></div>`}).join('')}
+  ${o.items.map(i=>{const p=prod(i.id),rq=retQ(o.folio,i.id);return `<div class="ol"><span class="e2">${pic(p)}</span><span style="flex:1">${i.q}× ${esc(p.n)}${rq?` <small class="mut">(${rq} en devolución)</small>`:''}</span><b>${money(i.p*i.q)}</b></div>`}).join('')}
   ${o.disc?`<div class="tr"><span class="mut">Descuento</span><span>−${money(o.disc)}</span></div>`:''}
   <div class="tr"><span class="mut">Envío</span><span>${o.ship?money(o.ship):'Gratis'}</span></div>
   <div class="tr t"><span>Total</span><span>${money(o.total)}</span></div>
@@ -191,7 +193,7 @@ function renderRets(){const c=$('#rets');if(!c)return;
   c.innerHTML=L.length?L.slice().reverse().map(r=>{const st=rStage(r),done=st===4,
   ST=['Solicitud aprobada','Pieza en camino a METZA','Pieza recibida','Revisión de calidad',RFIN[r.s]];
   return `<article class="card oc"><div class="oh"><div><h3>${r.id}</h3><span class="mut">Pedido ${r.folio} · ${fdate(r.date)}</span></div>${r.cancel?'<span class="bd no">Cancelada</span>':r.rej?'<span class="bd no">Rechazada</span>':done?'<span class="bd ok">Completada</span>':'<span class="bd go">En proceso</span>'}</div>
-  ${r.items.map(i=>`<div class="ol"><span class="e2">${prod(i.id).e}</span><span style="flex:1">${i.q}× ${esc(prod(i.id).n)}</span></div>`).join('')}
+  ${r.items.map(i=>`<div class="ol"><span class="e2">${pic(prod(i.id))}</span><span style="flex:1">${i.q}× ${esc(prod(i.id).n)}</span></div>`).join('')}
   <div class="tr"><span class="mut">Motivo</span><span>${lab(REAS,r.r)}</span></div>
   <div class="tr"><span class="mut">Solución</span><span>${lab(SOL,r.s)}${r.s!=='cambio'?' · '+money(r.amt):''}</span></div>
   ${r.rej?`<p class="mut" style="margin-top:10px">Motivo del rechazo: ${esc(r.rej)}</p>`:''}
@@ -203,7 +205,7 @@ function renderRets(){const c=$('#rets');if(!c)return;
 function openDrawer(){$('#drawer').classList.add('open');$('#ov').classList.add('open')}
 function closeAll(){$$('.modal,.drawer,.ov').forEach(e=>e.classList.remove('open'))}
 function openProd(id){const p=prod(id);
-  $('#prodBody').innerHTML=`<div class="pd"><div class="big2" style="background:${TINT[p.c]}" aria-hidden="true">${p.e}</div><div>
+  $('#prodBody').innerHTML=`<div class="pd"><div class="big2" style="background:${TINT[p.c]}" aria-hidden="true">${pic(p)}</div><div>
   <span class="chip">${esc(p.c.toUpperCase())}</span><h2 style="margin:8px 0">${esc(p.n)}</h2><p>${esc(p.d)}</p><b class="pp">${money(p.p)}</b>
   <ul class="mut feats"><li>✋ Hecha a mano en Metepec; cada pieza es única.</li><li>📦 Llega en 1 a 6 días según tu zona; envío gratis desde $1,000.</li><li>↩️ Tienes ${RET_DAYS} días para devolverla.</li></ul>
   <div class="pr"><span class="q"><button data-pq="-1" aria-label="Menos">−</button><span id="pq">1</span><button data-pq="1" aria-label="Más">+</button></span>${p.off?'<button class="btn" disabled>Agotado</button>':`<button class="btn" data-addq="${p.id}">Agregar al carrito</button>`}</div></div></div>`;
@@ -317,8 +319,8 @@ const V={
 <form id="wL" class="fm" style="margin-top:12px"><label>Número de pedido<input name="f" required placeholder="MTZ-482913"></label><label>Correo de la compra<input name="e" type="email" required placeholder="cliente@ejemplo.com"></label><button class="btn sm ghost w">Buscar pedido</button></form></details>`,
 2:()=>{const o=ord();return `<form id="w2"><p class="mut" style="margin-bottom:12px">Pedido <b>${o.folio}</b>. Selecciona las piezas y cuántas quieres devolver.</p>
 <div class="opts">${o.items.map(i=>{const p=prod(i.id),rest=i.q-retQ(o.folio,i.id);
-  if(rest<1)return `<div class="opt dis"><span class="e2">${p.e}</span><span><b>${esc(p.n)}</b><small>Ya está en una devolución.</small></span></div>`;
-  return `<label class="opt"><input type="checkbox" name="i" value="${i.id}"${w.sel[i.id]?' checked':''}><span class="e2">${p.e}</span><span style="flex:1"><b>${esc(p.n)}</b><small>${money(i.p*(1-o.dr))} c/u${o.dr?' (con descuento aplicado)':''}</small></span>${rest>1?`<select name="q${i.id}" aria-label="Cantidad a devolver" style="width:auto">${Array.from({length:rest},(_,k)=>`<option${w.sel[i.id]===k+1?' selected':''}>${k+1}</option>`).join('')}</select>`:'<span class="mut">1 pza</span>'}</label>`}).join('')}</div>
+  if(rest<1)return `<div class="opt dis"><span class="e2">${pic(p)}</span><span><b>${esc(p.n)}</b><small>Ya está en una devolución.</small></span></div>`;
+  return `<label class="opt"><input type="checkbox" name="i" value="${i.id}"${w.sel[i.id]?' checked':''}><span class="e2">${pic(p)}</span><span style="flex:1"><b>${esc(p.n)}</b><small>${money(i.p*(1-o.dr))} c/u${o.dr?' (con descuento aplicado)':''}</small></span>${rest>1?`<select name="q${i.id}" aria-label="Cantidad a devolver" style="width:auto">${Array.from({length:rest},(_,k)=>`<option${w.sel[i.id]===k+1?' selected':''}>${k+1}</option>`).join('')}</select>`:'<span class="mut">1 pza</span>'}</label>`}).join('')}</div>
 <div class="nav2">${back}<button class="btn dk sm">Continuar</button></div></form>`},
 3:()=>`<form id="w3">${radios(REAS,'r',w.r)}
 <div id="fotos"${w.r&&w.r!=='arrep'?'':' hidden'}><label class="mut" style="font-weight:600">Fotos de la pieza y del embalaje <span id="freq">${w.r==='dano'?'(obligatorias)':'(recomendadas)'}</span><input type="file" id="fi" accept="image/*" multiple style="margin-top:6px"></label><div class="thumbs" id="th"></div></div>

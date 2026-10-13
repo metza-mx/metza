@@ -275,3 +275,8 @@ body.admin{background:#faf6f1}
 .lock:hover,.lock:focus-visible{opacity:.9}
 .box.sm2{width:min(440px,100%)}
 .sm2 .mh h2{font-size:24px}
+/* Fotos de producto: se ajustan al tamaño del emoji al que reemplazan */
+.pic{width:1.15em;height:1.15em;object-fit:contain;vertical-align:middle;mix-blend-mode:multiply}
+button.em{height:170px;padding:0;display:grid;place-items:center}
+.em .pic{width:auto;height:140px;max-width:90%}
+.big2 .pic{width:auto;height:1.6em;max-width:100%}

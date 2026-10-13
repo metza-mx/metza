@@ -76,7 +76,7 @@ function vProds(){
   const sold={};orders.filter(o=>oKey(o)!=='can').forEach(o=>o.items.forEach(i=>sold[i.id]=(sold[i.id]||0)+i.q));
   return `<div class="ah2"><div><h2>Productos</h2><p class="mut">Cambia precios y marca piezas como agotadas. Se refleja al momento en la tienda.</p></div><button class="btn sm ghost" data-resetp>Restablecer precios</button></div>
   <div class="card"><div class="tw"><table class="tb"><thead><tr><th>Pieza</th><th>Categoría</th><th class="n">Vendidas</th><th>Precio</th><th>Disponible</th></tr></thead><tbody>
-  ${cfg.products.map(p=>`<tr${p.off?' class="off"':''}><td><span class="e2">${p.e}</span> <b>${esc(p.n)}</b></td><td>${esc(p.c)}</td><td class="n">${sold[p.id]||0}</td>
+  ${cfg.products.map(p=>`<tr${p.off?' class="off"':''}><td><span class="e2">${pic(p)}</span> <b>${esc(p.n)}</b></td><td>${esc(p.c)}</td><td class="n">${sold[p.id]||0}</td>
   <td><label class="pin">$<input type="number" min="1" step="10" value="${p.p}" data-price="${p.id}" aria-label="Precio de ${esc(p.n)}"></label>${p.p!==p.p0?`<br><small class="mut">Antes ${money(p.p0)}</small>`:''}</td>
   <td><label class="sw"><input type="checkbox" data-avail="${p.id}"${p.off?'':' checked'}><span>${p.off?'Agotado':'Disponible'}</span></label></td></tr>`).join('')}
   </tbody></table></div></div>`}
@@ -103,7 +103,7 @@ function showOrder(f){const o=findO(f),k=oKey(o),R=rets.filter(r=>r.folio===o.fo
   openModal(`<div class="oh"><span class="mut">Comprado el ${fdt(o.date)}</span>${badge(oStatus(o))}</div>
   <div class="cols2"><div><small class="lbt">CLIENTE</small><p>${esc(o.n)}<br><a href="mailto:${esc(o.e)}">${esc(o.e)}</a></p></div>
   <div><small class="lbt">ENVÍO</small><p>${esc(o.a)}<br>${ZN[o.z][0]} · ${ZN[o.z][1]}</p></div></div>
-  ${o.items.map(i=>`<div class="ol"><span class="e2">${prod(i.id).e}</span><span style="flex:1">${i.q}× ${esc(prod(i.id).n)}</span><b>${money(i.p*i.q)}</b></div>`).join('')}
+  ${o.items.map(i=>`<div class="ol"><span class="e2">${pic(prod(i.id))}</span><span style="flex:1">${i.q}× ${esc(prod(i.id).n)}</span><b>${money(i.p*i.q)}</b></div>`).join('')}
   ${o.disc?`<div class="tr"><span class="mut">Descuento METZA10</span><span>−${money(o.disc)}</span></div>`:''}
   <div class="tr"><span class="mut">Envío</span><span>${o.ship?money(o.ship):'Gratis'}</span></div>
   <div class="tr t"><span>Total</span><span>${money(o.total)}</span></div>
@@ -117,7 +117,7 @@ function showRet(id){const r=rets.find(x=>x.id===id),o=findO(r.folio),st=rStage(
   openModal(`<div class="oh"><span class="mut">Pedido <button class="lnk2" data-vo="${r.folio}">${r.folio}</button> · ${fdt(r.date)}</span>${badge(RB[k])}</div>
   <div class="cols2"><div><small class="lbt">CLIENTE</small><p>${esc(o.n)}<br><a href="mailto:${esc(o.e)}">${esc(o.e)}</a></p></div>
   <div><small class="lbt">RETORNO</small><p>${lab(MET,r.m)}${r.m==='recoleccion'?'<br>'+esc(r.a):''}<br>Guía ${r.g}</p></div></div>
-  ${r.items.map(i=>`<div class="ol"><span class="e2">${prod(i.id).e}</span><span style="flex:1">${i.q}× ${esc(prod(i.id).n)}</span><b>${money(i.u*i.q)}</b></div>`).join('')}
+  ${r.items.map(i=>`<div class="ol"><span class="e2">${pic(prod(i.id))}</span><span style="flex:1">${i.q}× ${esc(prod(i.id).n)}</span><b>${money(i.u*i.q)}</b></div>`).join('')}
   <div class="tr"><span class="mut">Motivo</span><span>${lab(REAS,r.r)}</span></div>
   <div class="tr"><span class="mut">Solución</span><span>${lab(SOL,r.s)}</span></div>
   ${r.fee?`<div class="tr"><span class="mut">Costo de guía</span><span>${money(r.fee)}</span></div>`:''}
