@@ -1,4 +1,5 @@
 *{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 :root{--cream:#F4ECE1;--paper:#FDFBF7;--br:#5C3A21;--tc:#D4694A;--tx:#7A4A2A}
 body{font:16px/1.55 Inter,system-ui,sans-serif;color:var(--br);background:#fff}
@@ -220,3 +221,55 @@ footer .fe{margin-top:14px;max-width:360px}footer .fe a{display:inline;color:#ff
 .ct-i{display:grid;gap:18px}.ct-i h3{font-size:19px;margin-bottom:6px}
 .ct-i ul{list-style:none;padding:0}.ct-i li{margin:8px 0}.ct-i a{color:var(--tc);font-weight:500}
 @media(max-width:800px){.hero-art{max-width:none;justify-self:stretch}}
+
+/* Panel de administración */
+body.admin{background:#faf6f1}
+.fb a{color:#cdb8a3}
+.ah .hd{max-width:1320px}
+.ah .ic{margin-left:auto;gap:10px}
+.login{max-width:440px;margin:64px auto;padding:34px}
+.login h1{font-size:34px}
+.err{color:#b23a30;font-size:14px}
+.demo{margin-top:20px;background:var(--cream);border-radius:14px;padding:14px 16px;font-size:14px}
+.demo code{background:#fff;border-radius:6px;padding:1px 6px}
+.adm{max-width:1320px;margin:auto;display:grid;grid-template-columns:210px minmax(0,1fr);gap:28px;padding:28px 24px 60px}
+.side{display:flex;flex-direction:column;gap:4px;position:sticky;top:96px;align-self:start}
+.side button{display:flex;gap:10px;align-items:center;background:none;border:0;border-radius:12px;padding:11px 14px;font:500 15px Inter,sans-serif;color:var(--br);cursor:pointer;text-align:left}
+.side button:hover{background:#fff}
+.side button.on{background:var(--br);color:#fff}
+@media(max-width:860px){.adm{grid-template-columns:1fr;gap:16px;padding:16px 16px 48px}.side{position:static;flex-direction:row;overflow-x:auto}.side button{white-space:nowrap}}
+.ah2{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.ah2 h2{font-size:30px}
+.amain .card h3{font-size:20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:#fff;border-radius:18px;padding:18px 20px;box-shadow:0 4px 18px #5c3a210d}
+.kpi small{color:var(--tx);font-size:13px;display:block}
+.kpi b{font-size:28px;display:block;margin:4px 0;color:#111;font-variant-numeric:tabular-nums}
+.kpi span{font-size:13px;color:var(--tx)}
+.agrid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px}
+@media(max-width:1000px){.agrid{grid-template-columns:1fr}}
+.bars{display:grid;gap:14px;margin-top:16px}
+.br{display:grid;grid-template-columns:130px 1fr 80px;gap:12px;align-items:center;font-size:14px}
+.br i{height:12px;background:#f3ebe2;border-radius:4px;overflow:hidden}
+.br em{display:block;height:100%;background:var(--tc);border-radius:0 4px 4px 0}
+.br b{text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:480px){.br{grid-template-columns:96px 1fr 70px;gap:8px}}
+.todo{list-style:none;padding:0;margin-top:10px}
+.todo li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0e8df;font-size:14px}
+.tw{overflow-x:auto}
+.tb{width:100%;border-collapse:collapse;font-size:14px}
+.tb th{text-align:left;font-weight:600;color:var(--tx);font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid #eee5da;white-space:nowrap}
+.tb td{padding:12px;border-bottom:1px solid #f3ece4;vertical-align:middle}
+.tb tr:hover td{background:#fdfaf6}
+.tb .n{text-align:right;font-variant-numeric:tabular-nums}
+.tb tr.off td{opacity:.6}
+.pills small{opacity:.7;margin-left:4px}
+.pin{display:inline-flex;align-items:center;gap:4px}.pin input{width:100px;padding:7px 10px}
+.sw{display:inline-flex;gap:8px;align-items:center;cursor:pointer}.sw input{width:auto}
+.lbt{font-weight:700;letter-spacing:.06em;color:var(--tx);font-size:12px}
+.note{background:var(--cream);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:14px}
+.ic .btn.dk,.ic .btn.dk:hover{color:#fff;background:var(--br);font-size:14px;padding:8px 16px;border-radius:99px}
+.btn:disabled,.btn:disabled:hover{background:#cdbfb1;color:#fff;cursor:not-allowed;box-shadow:none;transform:none;filter:none}
+.tb td:first-child,.tb td:nth-child(2){white-space:nowrap}
+.ic .btn{white-space:nowrap}
+@media(max-width:480px){.ah .logo small{display:none}.ah .logo b{font-size:26px}}

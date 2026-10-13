@@ -1,20 +1,24 @@
 /* ---------- Estructura común (encabezado, pie, carrito, ventanas) ---------- */
 (function(){
 const P=document.body.dataset.page;
+const ADM=P==='admin';
 const L=[['index.html','inicio','Inicio'],['catalogo.html','catalogo','Catálogo'],['mis-compras.html','compras','Mis compras'],['devoluciones.html','devoluciones','Devoluciones'],['pagos.html','pagos','Pagos y envíos'],['contacto.html','contacto','Contacto']];
-document.body.insertAdjacentHTML('afterbegin',`<header><div class="hd">
+document.body.insertAdjacentHTML('afterbegin',ADM?`<header class="ah"><div class="hd">
+<a href="admin.html" class="logo"><b id="brand"></b><small>Panel de administración</small></a>
+<div class="ic"><a class="btn sm ghost" href="index.html">Ver tienda</a><button class="btn sm dk" id="bOut" hidden>Cerrar sesión</button></div>
+</div></header>`:`<header><div class="hd">
 <a href="index.html" class="logo"><b id="brand"></b><small id="tag"></small></a>
 <nav id="nav">${L.map(([h,k,t])=>`<a href="${h}"${k===P?' class="act" aria-current="page"':''}>${t}</a>`).join('')}</nav>
 <div class="ic"><button id="bCart" aria-label="Abrir carrito">🛍️<span id="cnt">0</span></button><button id="bMenu" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">☰</button></div>
 </div></header>`);
-document.body.insertAdjacentHTML('beforeend',`
+document.body.insertAdjacentHTML('beforeend',(ADM?'':`
 <footer><div class="ft">
 <div><b id="fbrand"></b>Artesanías de Metepec hechas a mano. Cada pieza lleva una historia, una tradición y una identidad cultural.
 <p class="fe">📦 Cada pieza viaja protegida con embalaje resistente y amortiguador. <a href="pagos.html#embalaje">Envíos y embalaje seguro</a></p></div>
 <div><h4>Tienda</h4><a href="catalogo.html">Catálogo</a><a href="index.html#nosotros">Nosotros</a><a href="catalogo.html?cat=Catrinas">Catrinas</a><a href="catalogo.html?cat=Barro">Barro</a></div>
 <div><h4>Ayuda</h4><a href="mis-compras.html">Mis compras</a><a href="devoluciones.html">Devoluciones</a><a href="pagos.html">Pagos y envíos</a></div>
 <div><h4>Contacto</h4><a id="femail" href="mailto:hola@metza.mx"></a><span>Metepec, Estado de México</span><a href="contacto.html">Escríbenos</a></div>
-</div><div class="fb">© ${new Date().getFullYear()} METZA · Hecho con orgullo en Metepec, Estado de México</div></footer>
+</div><div class="fb">© ${new Date().getFullYear()} METZA · Hecho con orgullo en Metepec, Estado de México · <a href="admin.html">Acceso administrador</a></div></footer>`)+`
 <div class="ov" id="ov"></div>
 <aside class="drawer" id="drawer" aria-label="Carrito">
 <div class="mh"><h2>Tu carrito</h2><button class="x" data-close aria-label="Cerrar">✕</button></div>
@@ -54,6 +58,9 @@ products:[
 {id:11,e:'🎭',c:'Catrinas',n:'Catrina Elegante',d:'Catrina con sombrero y vestido detallado a mano.',p:780},
 {id:12,e:'🍲',c:'Barro',n:'Cazuela de Barro',d:'Cazuela para cocinar y servir, de barro tradicional.',p:310}]};
 
+/* Cambios del admin a productos (precio y disponibilidad) */
+const prodOv=ls.get('metza_prod',{});
+cfg.products.forEach(p=>{p.p0=p.p;Object.assign(p,prodOv[p.id]||{})});
 const TINT={'Árbol de la Vida':'#e4eed8','Catrinas':'#f8e0da','Tlanchanas':'#d9eaec','Barro':'#f4e1cc'};
 const PAYS=['💳 Tarjeta de crédito o débito','🏦 Transferencia bancaria (SPEI)','🏪 Pago en efectivo en OXXO','📱 Mercado Pago'],
 ZN=[['Metepec / Toluca','1 día',1],['CDMX y Edomex','2–3 días',3],['Resto del país','4–6 días',6]];
@@ -95,24 +102,32 @@ if(!orders){const ago=d=>new Date(Date.now()-d*DAY).toISOString();
   ls.set('metza_orders',orders)}
 const saveOrders=()=>ls.set('metza_orders',orders),saveRets=()=>ls.set('metza_returns',rets);
 const findO=f=>orders.find(o=>o.folio===String(f||'').trim().toUpperCase());
-const delivered=o=>new Date(o.date).getTime()+ZN[o.z][2]*DAY;
-function oStatus(o){const now=Date.now();
-  return now>=delivered(o)?['Entregado','ok']:now-new Date(o.date)<DAY?['En preparación','pr']:['En camino','go']}
-const retQ=(folio,id)=>rets.filter(r=>r.folio===folio&&!r.cancel).reduce((a,r)=>a+((r.items.find(i=>i.id==id)||{}).q||0),0);
-function canReturn(o){const now=Date.now(),lim=delivered(o)+RET_DAYS*DAY;
-  if(now<delivered(o))return[false,'Podrás solicitar una devolución cuando recibas tu pedido.'];
+/* o.st la fija el admin: prep, env, ent o can. Sin ella, el estado avanza con los días. */
+const estDel=o=>new Date(o.date).getTime()+ZN[o.z][2]*DAY;
+function delivered(o){
+  if(o.st)return o.st==='ent'?new Date(o.entAt||estDel(o)).getTime():null;
+  return Date.now()>=estDel(o)?estDel(o):null}
+const OST={prep:['En preparación','pr'],env:['En camino','go'],ent:['Entregado','ok'],can:['Cancelado','no']};
+const oKey=o=>o.st||(delivered(o)?'ent':Date.now()-new Date(o.date)<DAY?'prep':'env');
+const oStatus=o=>OST[oKey(o)];
+const mine=()=>orders.filter(o=>!o.adm);
+const retQ=(folio,id)=>rets.filter(r=>r.folio===folio&&!r.cancel&&!r.rej).reduce((a,r)=>a+((r.items.find(i=>i.id==id)||{}).q||0),0);
+function canReturn(o){if(o.st==='can')return[false,'Este pedido fue cancelado.'];
+  const now=Date.now(),dl=delivered(o),lim=dl+RET_DAYS*DAY;
+  if(!dl)return[false,'Podrás solicitar una devolución cuando recibas tu pedido.'];
   if(now>lim)return[false,'El plazo para devoluciones terminó el '+fdate(lim)+'.'];
   if(o.items.every(i=>retQ(o.folio,i.id)>=i.q))return[false,'Todas las piezas ya están en una devolución.'];
   return[true,'Puedes solicitar una devolución hasta el '+fdate(lim)+'.']}
-function rStage(r){if(r.cancel)return -1;const d=(Date.now()-new Date(r.date))/DAY;return ROFF.filter(x=>d>=x).length-1}
+/* r.st la fija el admin (0 a 4); r.rej guarda el motivo si la rechazó. */
+function rStage(r){if(r.cancel||r.rej)return -1;if(r.st!=null)return r.st;const d=(Date.now()-new Date(r.date))/DAY;return ROFF.filter(x=>d>=x).length-1}
 const sumItems=o=>o.items.map(i=>i.q+'× '+prod(i.id).n).join(', ');
 
 /* ---------- Render ---------- */
 function renderTexts(){
   document.title=document.body.dataset.title?document.body.dataset.title+' · '+cfg.brand:cfg.brand+' · '+cfg.tag;
-  $('#brand').textContent=cfg.brand;$('#tag').textContent=cfg.tag;
+  $('#brand').textContent=cfg.brand;if($('#tag'))$('#tag').textContent=cfg.tag;
   [['#heroT','heroT'],['#heroP','heroP'],['#about','about']].forEach(([s,k])=>{const e=$(s);if(e)e.textContent=cfg[k]});
-  $('#fbrand').textContent=cfg.brand;$('#femail').textContent=cfg.email;$('#femail').href='mailto:'+cfg.email}
+  if($('#fbrand')){$('#fbrand').textContent=cfg.brand;$('#femail').textContent=cfg.email;$('#femail').href='mailto:'+cfg.email}}
 const CATS=[...new Set(cfg.products.map(p=>p.c))];
 let fcat=new URLSearchParams(location.search).get('cat')||'';
 if(!CATS.includes(fcat))fcat='';
@@ -131,9 +146,9 @@ function renderGrid(){const g=$('#grid');if(!g)return;
   g.innerHTML=L.length?L.map(p=>`
   <article class="card prod"><button class="em" style="--t:${TINT[p.c]}" data-view="${p.id}" aria-label="Ver detalle de ${esc(p.n)}">${p.e}</button>
   <span class="chip">${esc(p.c.toUpperCase())}</span><h3>${esc(p.n)}</h3><p>${esc(p.d)}</p>
-  <div class="pr"><b>${money(p.p)}</b><span><button class="btn sm ghost" data-view="${p.id}">Ver</button> <button class="btn sm" data-add="${p.id}">Agregar</button></span></div></article>`).join('')
+  <div class="pr"><b>${money(p.p)}</b><span><button class="btn sm ghost" data-view="${p.id}">Ver</button> ${p.off?'<button class="btn sm" disabled>Agotado</button>':`<button class="btn sm" data-add="${p.id}">Agregar</button>`}</span></div></article>`).join('')
   :'<p class="empty">No encontramos piezas con esa búsqueda. <button class="lnk2" data-cat="">Ver todo el catálogo</button></p>'}
-function renderCart(){
+function renderCart(){if(!$('#cnt'))return;
   const ids=Object.keys(cart).filter(id=>prod(id)),t=totals();
   $('#cnt').textContent=ids.reduce((a,id)=>a+cart[id],0);
   $('#cartBody').innerHTML=ids.length?ids.map(id=>{const p=prod(id);return `
@@ -149,25 +164,28 @@ function renderCart(){
   <button class="btn" style="width:100%;margin-top:12px" id="goPay">Proceder al pago</button>`;
   saveCart()}
 function renderOrders(){const c=$('#orders');if(!c)return;
-  c.innerHTML=orders.length?orders.slice().reverse().map(o=>{const [s,k]=oStatus(o),[ok,msg]=canReturn(o);
+  const L=mine();
+  c.innerHTML=L.length?L.slice().reverse().map(o=>{const [s,k]=oStatus(o),[ok,msg]=canReturn(o);
   return `<article class="card oc"><div class="oh"><div><h3>${o.folio}${o.demo?' <span class="chip">EJEMPLO</span>':''}</h3><span class="mut">Comprado el ${fdate(o.date)}</span></div><span class="bd ${k}">${s}</span></div>
   ${o.items.map(i=>{const p=prod(i.id),rq=retQ(o.folio,i.id);return `<div class="ol"><span class="e2">${p.e}</span><span style="flex:1">${i.q}× ${esc(p.n)}${rq?` <small class="mut">(${rq} en devolución)</small>`:''}</span><b>${money(i.p*i.q)}</b></div>`}).join('')}
   ${o.disc?`<div class="tr"><span class="mut">Descuento</span><span>−${money(o.disc)}</span></div>`:''}
   <div class="tr"><span class="mut">Envío</span><span>${o.ship?money(o.ship):'Gratis'}</span></div>
   <div class="tr t"><span>Total</span><span>${money(o.total)}</span></div>
-  <p class="mut">${PAYS[o.m]} · Envío a ${esc(o.a)} (${ZN[o.z][0]})<br>${k==='ok'?'Entregado el ':'Entrega estimada: '}${fdate(delivered(o))}</p>
+  <p class="mut">${PAYS[o.m]} · Envío a ${esc(o.a)} (${ZN[o.z][0]})<br>${k==='no'?'Pedido cancelado':k==='ok'?'Entregado el '+fdate(delivered(o)):'Entrega estimada: '+fdate(estDel(o))}</p>
   <p class="mut" style="margin-top:6px">↩️ ${esc(msg)}</p>
   <div class="acts">${ok?`<a class="btn sm" href="devoluciones.html?pedido=${o.folio}">Solicitar devolución</a>`:''}<button class="btn sm ghost" data-rebuy="${o.folio}">Volver a comprar</button></div></article>`}).join('')
   :'<p class="mut">Todavía no tienes compras. <a href="catalogo.html">Ve al catálogo</a>.</p>'}
 function renderRets(){const c=$('#rets');if(!c)return;
-  c.innerHTML=rets.length?rets.slice().reverse().map(r=>{const st=rStage(r),done=st===4,
+  const L=rets.filter(r=>!r.adm);
+  c.innerHTML=L.length?L.slice().reverse().map(r=>{const st=rStage(r),done=st===4,
   ST=['Solicitud aprobada','Pieza en camino a METZA','Pieza recibida','Revisión de calidad',RFIN[r.s]];
-  return `<article class="card oc"><div class="oh"><div><h3>${r.id}</h3><span class="mut">Pedido ${r.folio} · ${fdate(r.date)}</span></div>${r.cancel?'<span class="bd no">Cancelada</span>':done?'<span class="bd ok">Completada</span>':'<span class="bd go">En proceso</span>'}</div>
+  return `<article class="card oc"><div class="oh"><div><h3>${r.id}</h3><span class="mut">Pedido ${r.folio} · ${fdate(r.date)}</span></div>${r.cancel?'<span class="bd no">Cancelada</span>':r.rej?'<span class="bd no">Rechazada</span>':done?'<span class="bd ok">Completada</span>':'<span class="bd go">En proceso</span>'}</div>
   ${r.items.map(i=>`<div class="ol"><span class="e2">${prod(i.id).e}</span><span style="flex:1">${i.q}× ${esc(prod(i.id).n)}</span></div>`).join('')}
   <div class="tr"><span class="mut">Motivo</span><span>${lab(REAS,r.r)}</span></div>
   <div class="tr"><span class="mut">Solución</span><span>${lab(SOL,r.s)}${r.s!=='cambio'?' · '+money(r.amt):''}</span></div>
-  ${r.cancel?'':`<ul class="tl">${ST.map((t,i)=>`<li class="${i<st||done?'done':i===st?'cur':''}"><b>${t}</b><small>${i<=st?'':'Estimado: '}${fdate(new Date(r.date).getTime()+ROFF[i]*DAY)}</small></li>`).join('')}</ul>`}
-  <div class="acts">${r.cancel?'':`<button class="btn sm ghost" data-lbl="${r.id}">Ver guía</button>`}${st===0?`<button class="btn sm ghost" data-cancel="${r.id}">Cancelar solicitud</button>`:''}</div></article>`}).join('')
+  ${r.rej?`<p class="mut" style="margin-top:10px">Motivo del rechazo: ${esc(r.rej)}</p>`:''}
+  ${r.cancel||r.rej?'':`<ul class="tl">${ST.map((t,i)=>`<li class="${i<st||done?'done':i===st?'cur':''}"><b>${t}</b><small>${i<=st?'':'Estimado: '}${fdate(new Date(r.date).getTime()+ROFF[i]*DAY)}</small></li>`).join('')}</ul>`}
+  <div class="acts">${r.cancel||r.rej?'':`<button class="btn sm ghost" data-lbl="${r.id}">Ver guía</button>`}${st===0?`<button class="btn sm ghost" data-cancel="${r.id}">Cancelar solicitud</button>`:''}</div></article>`}).join('')
   :'<p class="mut">Aún no tienes devoluciones.</p>'}
 
 /* ---------- Ventanas ---------- */
@@ -177,7 +195,7 @@ function openProd(id){const p=prod(id);
   $('#prodBody').innerHTML=`<div class="pd"><div class="big2" style="background:${TINT[p.c]}" aria-hidden="true">${p.e}</div><div>
   <span class="chip">${esc(p.c.toUpperCase())}</span><h2 style="margin:8px 0">${esc(p.n)}</h2><p>${esc(p.d)}</p><b class="pp">${money(p.p)}</b>
   <ul class="mut feats"><li>✋ Hecha a mano en Metepec; cada pieza es única.</li><li>📦 Llega en 1 a 6 días según tu zona; envío gratis desde $1,000.</li><li>↩️ Tienes ${RET_DAYS} días para devolverla.</li></ul>
-  <div class="pr"><span class="q"><button data-pq="-1" aria-label="Menos">−</button><span id="pq">1</span><button data-pq="1" aria-label="Más">+</button></span><button class="btn" data-addq="${p.id}">Agregar al carrito</button></div></div></div>`;
+  <div class="pr"><span class="q"><button data-pq="-1" aria-label="Menos">−</button><span id="pq">1</span><button data-pq="1" aria-label="Más">+</button></span>${p.off?'<button class="btn" disabled>Agotado</button>':`<button class="btn" data-addq="${p.id}">Agregar al carrito</button>`}</div></div></div>`;
   closeAll();$('#mProd').classList.add('open')}
 function showLabel(id){const r=rets.find(x=>x.id===id),o=findO(r.folio);
   $('#lblBody').innerHTML=`<div class="lbl"><div class="tr"><b>GUÍA DE RETORNO</b><b>${r.g}</b></div><div class="bar" aria-hidden="true"></div>
@@ -190,6 +208,7 @@ function showLabel(id){const r=rets.find(x=>x.id===id),o=findO(r.folio);
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   const d=b.dataset;
+  if((d.add||d.addq)&&prod(d.add||d.addq).off){toast('Esta pieza está agotada');return}
   if(d.add){cart[d.add]=(cart[d.add]||0)+1;renderCart();toast(prod(d.add).n+' agregado al carrito')}
   else if(d.view)openProd(d.view);
   else if(d.pq){const q=$('#pq');q.textContent=Math.min(10,Math.max(1,+q.textContent+ +d.pq))}
@@ -208,13 +227,13 @@ document.addEventListener('click',e=>{
     if(!v){coupon=''}else if(v==='METZA10'){coupon=v;toast('Descuento aplicado')}else{coupon='';toast('Código no válido')}renderCart()}
   else if(b.id==='goPay')openPay();
   else if(d.close!==undefined)closeAll()});
-$('#bCart').onclick=openDrawer;
+if($('#bCart'))$('#bCart').onclick=openDrawer;
 $('#ov').onclick=closeAll;
 $$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeAll()}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
 if($('#q'))$('#q').oninput=renderGrid;
 if($('#sort'))$('#sort').onchange=renderGrid;
-$('#bMenu').onclick=()=>{const h=$('header'),o=h.classList.toggle('open');$('#bMenu').setAttribute('aria-expanded',o);$('#bMenu').textContent=o?'✕':'☰'};
+if($('#bMenu'))$('#bMenu').onclick=()=>{const h=$('header'),o=h.classList.toggle('open');$('#bMenu').setAttribute('aria-expanded',o);$('#bMenu').textContent=o?'✕':'☰'};
 
 /* ---------- Pago (simulado) ---------- */
 function openPay(){
@@ -277,7 +296,7 @@ const radios=(L,name,cur)=>`<div class="opts">${L.map(([k,t,h])=>`<label class="
 const back='<button type="button" class="btn sm ghost" data-a="back">Atrás</button>';
 const V={
 1:()=>`<form id="w1"><p class="mut" style="margin-bottom:12px">Elige el pedido del que quieres devolver piezas.</p>
-<div class="opts">${orders.slice().reverse().map(o=>{const [ok,msg]=canReturn(o);return `<label class="opt${ok?'':' dis'}"><input type="radio" name="o" value="${o.folio}"${ok?'':' disabled'}${w.folio===o.folio?' checked':''} required><span><b>${o.folio} · ${fdate(o.date)}</b><small>${esc(sumItems(o))} · ${money(o.total)}</small><small>${esc(msg)}</small></span></label>`}).join('')||'<p class="mut">No hay compras registradas en este navegador.</p>'}</div>
+<div class="opts">${mine().slice().reverse().map(o=>{const [ok,msg]=canReturn(o);return `<label class="opt${ok?'':' dis'}"><input type="radio" name="o" value="${o.folio}"${ok?'':' disabled'}${w.folio===o.folio?' checked':''} required><span><b>${o.folio} · ${fdate(o.date)}</b><small>${esc(sumItems(o))} · ${money(o.total)}</small><small>${esc(msg)}</small></span></label>`}).join('')||'<p class="mut">No hay compras registradas en este navegador.</p>'}</div>
 <div class="nav2"><span></span><button class="btn dk sm">Continuar</button></div></form>
 <details class="lk"><summary>¿No ves tu pedido? Búscalo con tu número y correo</summary>
 <form id="wL" class="fm" style="margin-top:12px"><label>Número de pedido<input name="f" required placeholder="MTZ-482913"></label><label>Correo de la compra<input name="e" type="email" required placeholder="cliente@ejemplo.com"></label><button class="btn sm ghost w">Buscar pedido</button></form></details>`,
