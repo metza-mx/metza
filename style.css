@@ -227,8 +227,6 @@ body.admin{background:#faf6f1}
 .fb a{color:#cdb8a3}
 .ah .hd{max-width:1320px}
 .ah .ic{margin-left:auto;gap:10px}
-.login{max-width:440px;margin:64px auto;padding:34px}
-.login h1{font-size:34px}
 .err{color:#b23a30;font-size:14px}
 .demo{margin-top:20px;background:var(--cream);border-radius:14px;padding:14px 16px;font-size:14px}
 .demo code{background:#fff;border-radius:6px;padding:1px 6px}
@@ -273,3 +271,7 @@ body.admin{background:#faf6f1}
 .tb td:first-child,.tb td:nth-child(2){white-space:nowrap}
 .ic .btn{white-space:nowrap}
 @media(max-width:480px){.ah .logo small{display:none}.ah .logo b{font-size:26px}}
+.lock{background:none;border:0;cursor:pointer;font-size:12px;opacity:.35;margin-left:6px;padding:2px 4px;filter:grayscale(1)}
+.lock:hover,.lock:focus-visible{opacity:.9}
+.box.sm2{width:min(440px,100%)}
+.sm2 .mh h2{font-size:24px}

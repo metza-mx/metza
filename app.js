@@ -5,7 +5,7 @@ const ADM=P==='admin';
 const L=[['index.html','inicio','Inicio'],['catalogo.html','catalogo','Catálogo'],['mis-compras.html','compras','Mis compras'],['devoluciones.html','devoluciones','Devoluciones'],['pagos.html','pagos','Pagos y envíos'],['contacto.html','contacto','Contacto']];
 document.body.insertAdjacentHTML('afterbegin',ADM?`<header class="ah"><div class="hd">
 <a href="admin.html" class="logo"><b id="brand"></b><small>Panel de administración</small></a>
-<div class="ic"><a class="btn sm ghost" href="index.html">Ver tienda</a><button class="btn sm dk" id="bOut" hidden>Cerrar sesión</button></div>
+<div class="ic"><a class="btn sm ghost" href="index.html">Ver tienda</a><button class="btn sm dk" id="bOut">Cerrar sesión</button></div>
 </div></header>`:`<header><div class="hd">
 <a href="index.html" class="logo"><b id="brand"></b><small id="tag"></small></a>
 <nav id="nav">${L.map(([h,k,t])=>`<a href="${h}"${k===P?' class="act" aria-current="page"':''}>${t}</a>`).join('')}</nav>
@@ -18,7 +18,7 @@ document.body.insertAdjacentHTML('beforeend',(ADM?'':`
 <div><h4>Tienda</h4><a href="catalogo.html">Catálogo</a><a href="index.html#nosotros">Nosotros</a><a href="catalogo.html?cat=Catrinas">Catrinas</a><a href="catalogo.html?cat=Barro">Barro</a></div>
 <div><h4>Ayuda</h4><a href="mis-compras.html">Mis compras</a><a href="devoluciones.html">Devoluciones</a><a href="pagos.html">Pagos y envíos</a></div>
 <div><h4>Contacto</h4><a id="femail" href="mailto:hola@metza.mx"></a><span>Metepec, Estado de México</span><a href="contacto.html">Escríbenos</a></div>
-</div><div class="fb">© ${new Date().getFullYear()} METZA · Hecho con orgullo en Metepec, Estado de México · <a href="admin.html">Acceso administrador</a></div></footer>`)+`
+</div><div class="fb">© ${new Date().getFullYear()} METZA · Hecho con orgullo en Metepec, Estado de México <button class="lock" data-login aria-label="Acceso para el equipo" title="Acceso para el equipo">🔒</button></div></footer>`)+`
 <div class="ov" id="ov"></div>
 <aside class="drawer" id="drawer" aria-label="Carrito">
 <div class="mh"><h2>Tu carrito</h2><button class="x" data-close aria-label="Cerrar">✕</button></div>
@@ -26,6 +26,13 @@ document.body.insertAdjacentHTML('beforeend',(ADM?'':`
 <div class="modal" id="mPay"><div class="box"><div class="mh"><h2>Finalizar compra</h2><button class="x" data-close aria-label="Cerrar">✕</button></div><div class="mb" id="payBody"></div></div></div>
 <div class="modal" id="mProd"><div class="box"><div class="mh"><h2>Detalle de la pieza</h2><button class="x" data-close aria-label="Cerrar">✕</button></div><div class="mb" id="prodBody"></div></div></div>
 <div class="modal" id="mLbl"><div class="box"><div class="mh"><h2>Guía de retorno</h2><button class="x" data-close aria-label="Cerrar">✕</button></div><div class="mb" id="lblBody"></div></div></div>
+<div class="modal" id="mLogin"><div class="box sm2"><div class="mh"><h2>Acceso para el equipo</h2><button class="x" data-close aria-label="Cerrar">✕</button></div><div class="mb">
+<form id="fLogin" class="fm"><label class="w">Correo<input name="u" type="email" required autocomplete="username"></label>
+<label class="w">Contraseña<input name="p" type="password" required autocomplete="current-password"></label>
+<p class="w err" id="lErr" hidden>Correo o contraseña incorrectos.</p>
+<button class="btn dk w" style="padding:14px">Entrar al panel</button></form>
+<div class="demo"><b>Modo demostración</b><br>Correo: <code>admin@metza.mx</code> · Contraseña: <code>metza2026</code>
+<br><small>Acceso de muestra: la contraseña está en el código y el panel usa los datos guardados en este navegador.</small></div></div></div></div>
 <div class="toast" id="toast" role="status"></div>`);
 })();
 
@@ -35,6 +42,10 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
           set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const DAY=864e5;
+/* Acceso de demostración al panel (no es seguro: la contraseña está en el código) */
+const ADMIN_USER='admin@metza.mx',ADMIN_PASS='metza2026';
+const isAdmin=()=>{try{return sessionStorage.getItem('metza_admin')==='1'}catch(e){return false}};
+const setAdmin=v=>{try{v?sessionStorage.setItem('metza_admin','1'):sessionStorage.removeItem('metza_admin')}catch(e){}};
 const fdate=d=>new Date(d).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
 const rnd=n=>Array.from({length:n},()=>Math.floor(Math.random()*10)).join('');
 
@@ -223,6 +234,7 @@ document.addEventListener('click',e=>{
   else if(d.cancel){if(!confirm('¿Cancelar la solicitud '+d.cancel+'? Las piezas volverán a estar disponibles para devolución.'))return;
     rets.find(r=>r.id===d.cancel).cancel=1;saveRets();renderRets();renderOrders();toast('Solicitud cancelada')}
   else if(b.id==='bPrint')window.print();
+  else if('login' in d){if(isAdmin()){location.href='admin.html';return}closeAll();$('#mLogin').classList.add('open');$('#fLogin [name=u]').focus()}
   else if(b.id==='cpBtn'){const v=$('#cpIn').value.trim().toUpperCase();
     if(!v){coupon=''}else if(v==='METZA10'){coupon=v;toast('Descuento aplicado')}else{coupon='';toast('Código no válido')}renderCart()}
   else if(b.id==='goPay')openPay();
@@ -231,6 +243,9 @@ if($('#bCart'))$('#bCart').onclick=openDrawer;
 $('#ov').onclick=closeAll;
 $$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeAll()}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+if($('#fLogin'))$('#fLogin').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);
+  if(String(f.get('u')).trim().toLowerCase()===ADMIN_USER&&f.get('p')===ADMIN_PASS){setAdmin(1);location.href='admin.html'}
+  else $('#lErr').hidden=false};
 if($('#q'))$('#q').oninput=renderGrid;
 if($('#sort'))$('#sort').onchange=renderGrid;
 if($('#bMenu'))$('#bMenu').onclick=()=>{const h=$('header'),o=h.classList.toggle('open');$('#bMenu').setAttribute('aria-expanded',o);$('#bMenu').textContent=o?'✕':'☰'};

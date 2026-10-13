@@ -1,9 +1,8 @@
 /* ---------- Panel de administración (demostración: usa los datos guardados en este navegador) ---------- */
 (function(){
 const root=$('#adm');if(!root)return;
-const USER='admin@metza.mx',PASS='metza2026';
-const logged=()=>{try{return sessionStorage.getItem('metza_admin')==='1'}catch(e){return false}};
-const setLogged=v=>{try{v?sessionStorage.setItem('metza_admin','1'):sessionStorage.removeItem('metza_admin')}catch(e){}};
+/* Sin sesión iniciada no se muestra el panel: se regresa a la tienda */
+if(!isAdmin()){location.replace('index.html');return}
 const fdt=d=>new Date(d).toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 const badge=([t,k])=>`<span class="bd ${k}">${t}</span>`;
 const RST=r=>['Solicitud aprobada','Pieza en camino','Pieza recibida','Revisión de calidad',RFIN[r.s]];
@@ -33,16 +32,6 @@ function seed(){
   saveOrders();saveRets()}
 
 /* ---------- Vistas ---------- */
-function login(){
-  $('#bOut').hidden=true;
-  root.innerHTML=`<div class="login card">
-  <h1>Iniciar sesión</h1><p class="mut" style="margin:6px 0 20px">Acceso para el equipo de METZA.</p>
-  <form id="fLogin" class="fm"><label class="w">Correo<input name="u" type="email" required autocomplete="username"></label>
-  <label class="w">Contraseña<input name="p" type="password" required autocomplete="current-password"></label>
-  <p class="w err" id="lErr" hidden>Correo o contraseña incorrectos.</p>
-  <button class="btn dk w" style="padding:14px">Entrar</button></form>
-  <div class="demo"><b>Modo demostración</b><br>Correo: <code>${USER}</code> · Contraseña: <code>${PASS}</code>
-  <br><small>Este acceso es solo de muestra: la contraseña está en el código y el panel usa los datos guardados en este navegador.</small></div></div>`}
 function kpi(t,v,h){return `<div class="kpi"><small>${t}</small><b>${v}</b>${h?`<span>${h}</span>`:''}</div>`}
 function vResumen(){
   const val=orders.filter(o=>oKey(o)!=='can'),sales=val.reduce((a,o)=>a+o.total,0);
@@ -102,8 +91,7 @@ function vClientes(){
   </tbody></table></div>`:'<p class="mut">Sin resultados.</p>'}</div>`}
 const V={resumen:vResumen,pedidos:vPedidos,devoluciones:vDevs,productos:vProds,clientes:vClientes};
 function draw(focus){
-  if(!logged())return login();
-  seed();$('#bOut').hidden=false;
+  seed();
   root.innerHTML=`<div class="adm"><div class="side" role="navigation" aria-label="Secciones del panel">${TABS.map(([k,i,t])=>`<button data-tab="${k}"${k===tab?' class="on" aria-current="page"':''}><span aria-hidden="true">${i}</span>${t}</button>`).join('')}</div>
   <section class="amain">${V[tab]()}</section></div>`;
   if(focus&&$('#aq')){const e=$('#aq');e.focus();e.setSelectionRange(e.value.length,e.value.length)}}
@@ -143,12 +131,8 @@ function showRet(id){const r=rets.find(x=>x.id===id),o=findO(r.folio),st=rStage(
 
 /* ---------- Eventos ---------- */
 function refresh(){draw();const m=$('#mAdm');if(m.classList.contains('open')){const t=$('#admT').textContent.split(' ');t[0]==='Pedido'?showOrder(t[1]):showRet(t[1])}}
-document.addEventListener('submit',e=>{if(e.target.id!=='fLogin')return;e.preventDefault();
-  const f=new FormData(e.target);
-  if(String(f.get('u')).trim().toLowerCase()===USER&&f.get('p')===PASS){setLogged(1);draw();toast('Bienvenida al panel de METZA')}
-  else $('#lErr').hidden=false});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
-  if(b.id==='bOut'){setLogged(0);closeAll();draw();return}
+  if(b.id==='bOut'){setAdmin(0);location.href='index.html';return}
   if(d.tab){tab=d.tab;q='';history.replaceState(null,'','#'+tab);closeAll();draw()}
   else if('fo' in d){fo=d.fo;draw()}
   else if('fr' in d){fr=d.fr;draw()}
