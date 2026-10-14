@@ -4,6 +4,8 @@ const root=$('#adm');if(!root)return;
 /* Sin sesión iniciada no se muestra el panel: se regresa a la tienda */
 if(!isAdmin()){location.replace('index.html');return}
 const fdt=d=>new Date(d).toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+/* Etiqueta sin el emoji del inicio (en la tienda sí se muestra) */
+const txt=(L,k)=>lab(L,k).replace(/^\S+\s+/,'');
 const badge=([t,k])=>`<span class="bd ${k}">${t}</span>`;
 const RST=r=>['Solicitud aprobada','Pieza en camino','Pieza recibida','Revisión de calidad',RFIN[r.s]];
 const rKey=r=>r.cancel?'can':r.rej?'rej':rStage(r)===4?'done':'open';
@@ -69,7 +71,7 @@ function vDevs(){
   <div class="tool"><input id="aq" type="search" placeholder="Buscar por devolución, pedido o cliente" value="${esc(q)}" aria-label="Buscar devoluciones"></div>
   ${pills([['','Todas',n('')],['open','Abiertas',n('open')],['done','Completadas',n('done')],['rej','Rechazadas o canceladas',n('rej')]],fr,'data-fr')}
   <div class="card">${L.length?`<div class="tw"><table class="tb"><thead><tr><th>Devolución</th><th>Cliente</th><th>Motivo</th><th>Solución</th><th class="n">Importe</th><th>Estado</th><th></th></tr></thead><tbody>
-  ${L.map(r=>`<tr><td><b>${r.id}</b><br><small class="mut">${r.folio} · ${fdt(r.date)}</small></td><td>${esc(cli(r).n||'')}</td><td>${lab(REAS,r.r)}</td><td>${lab(SOL,r.s)}</td><td class="n">${r.s==='cambio'?'—':money(r.amt)}</td>
+  ${L.map(r=>`<tr><td><b>${r.id}</b><br><small class="mut">${r.folio} · ${fdt(r.date)}</small></td><td>${esc(cli(r).n||'')}</td><td>${txt(REAS,r.r)}</td><td>${txt(SOL,r.s)}</td><td class="n">${r.s==='cambio'?'—':money(r.amt)}</td>
   <td>${badge(RB[rKey(r)])}${rKey(r)==='open'?`<br><small class="mut">${RST(r)[rStage(r)]}</small>`:''}</td><td><button class="btn sm ghost" data-vr="${r.id}">Ver</button></td></tr>`).join('')}
   </tbody></table></div>`:'<p class="mut">No hay devoluciones con ese filtro.</p>'}</div>`}
 function vProds(){
@@ -116,10 +118,10 @@ function showRet(id){const r=rets.find(x=>x.id===id),o=findO(r.folio),st=rStage(
   $('#admT').textContent='Devolución '+r.id;
   openModal(`<div class="oh"><span class="mut">Pedido <button class="lnk2" data-vo="${r.folio}">${r.folio}</button> · ${fdt(r.date)}</span>${badge(RB[k])}</div>
   <div class="cols2"><div><small class="lbt">CLIENTE</small><p>${esc(o.n)}<br><a href="mailto:${esc(o.e)}">${esc(o.e)}</a></p></div>
-  <div><small class="lbt">RETORNO</small><p>${lab(MET,r.m)}${r.m==='recoleccion'?'<br>'+esc(r.a):''}<br>Guía ${r.g}</p></div></div>
+  <div><small class="lbt">RETORNO</small><p>${txt(MET,r.m)}${r.m==='recoleccion'?'<br>'+esc(r.a):''}<br>Guía ${r.g}</p></div></div>
   ${r.items.map(i=>`<div class="ol"><span class="e2">${pic(prod(i.id))}</span><span style="flex:1">${i.q}× ${esc(prod(i.id).n)}</span><b>${money(i.u*i.q)}</b></div>`).join('')}
-  <div class="tr"><span class="mut">Motivo</span><span>${lab(REAS,r.r)}</span></div>
-  <div class="tr"><span class="mut">Solución</span><span>${lab(SOL,r.s)}</span></div>
+  <div class="tr"><span class="mut">Motivo</span><span>${txt(REAS,r.r)}</span></div>
+  <div class="tr"><span class="mut">Solución</span><span>${txt(SOL,r.s)}</span></div>
   ${r.fee?`<div class="tr"><span class="mut">Costo de guía</span><span>${money(r.fee)}</span></div>`:''}
   <div class="tr t"><span>${r.s==='cambio'?'Pieza de cambio':r.s==='credito'?'Saldo a favor':'Reembolso'}</span><span>${r.s==='cambio'?'—':money(r.amt)}</span></div>
   ${r.c?`<p class="note">“${esc(r.c)}”</p>`:''}<p class="mut">${r.ph?`📷 ${r.ph} foto${r.ph>1?'s':''} adjunta${r.ph>1?'s':''}`:'Sin fotos adjuntas'}</p>
